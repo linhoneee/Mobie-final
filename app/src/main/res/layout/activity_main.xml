@@ -1,0 +1,42 @@
+<!--activity_main.xml-->
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <Button
+        android:id="@+id/buttonBrand"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Quản lý Thương Hiệu" />
+
+    <Button
+        android:id="@+id/buttonLogin"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Đăng nhập" />
+
+    <Button
+        android:id="@+id/buttonLogout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Đăng xuất"
+        android:visibility="gone" />
+
+    <Button
+        android:id="@+id/buttonProducts"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Xem Sản Phẩm" />
+
+    <Button
+        android:id="@+id/buttonCart"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Cart" />
+
+
+
+</LinearLayout>

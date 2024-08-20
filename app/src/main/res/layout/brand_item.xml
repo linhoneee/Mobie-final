@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--brand_item.xml-->
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <data>
+        <variable
+            name="brand"
+            type="com.example.brandtests.model.Brand" />
+
+        <variable
+            name="listener"
+            type="com.example.brandtests.adapter.BrandAdapter.OnBrandClickListener" />
+    </data>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <TextView
+            android:id="@+id/brandName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@{brand.name}"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/brandDescription"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@{brand.description}"
+            android:textSize="14sp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="end">
+
+            <Button
+                android:id="@+id/buttonUpdateBrand"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Sửa"
+                android:onClick="@{() -> listener.onUpdateClick(brand)}" />
+
+            <Button
+                android:id="@+id/buttonDeleteBrand"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Xóa"
+                android:onClick="@{() -> listener.onDeleteClick(brand)}" />
+
+
+        </LinearLayout>
+    </LinearLayout>
+</layout>

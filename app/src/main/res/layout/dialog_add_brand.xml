@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <EditText
+        android:id="@+id/editTextBrandName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Tên Thương Hiệu" />
+
+    <EditText
+        android:id="@+id/editTextBrandDescription"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Mô Tả Thương Hiệu" />
+
+    <Button
+        android:id="@+id/buttonConfirmAddBrand"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Thêm Thương Hiệu" />
+</LinearLayout>
