@@ -2,11 +2,14 @@ package com.example.brandtests.adapter;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -20,17 +23,17 @@ import com.example.brandtests.R;
 import com.example.brandtests.model.Inventory;
 import com.example.brandtests.model.Item;
 import com.example.brandtests.viewmodel.CartViewModel;
+import com.squareup.picasso.Picasso;
 
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.view.View;
-import android.widget.EditText;
 
 public class CartAdapter extends ArrayAdapter<Item> {
 
+    private static final String TAG = "CartAdapter";
     private CartViewModel cartViewModel;
     private Long userId;
     private Map<Long, String> itemWarehouseIdsMap;
@@ -75,11 +78,21 @@ public class CartAdapter extends ArrayAdapter<Item> {
             TextView productWarehouseIds = convertView.findViewById(R.id.cartProductWarehouseIds);
             Button increaseQuantityButton = convertView.findViewById(R.id.cartIncreaseQuantityButton);
             Button reduceQuantityButton = convertView.findViewById(R.id.cartReduceQuantityButton);
+            ImageView productImage = convertView.findViewById(R.id.cartProductImage);
 
             productName.setText(item.getName());
             productPrice.setText("Price: $" + item.getPrice().toString());
             productQuantity.setText(String.valueOf(item.getQuantity()));
             productWarehouseIds.setText("Warehouse IDs: " + (warehouseIds != null ? warehouseIds : "N/A"));
+
+            // Sử dụng Picasso để tải ảnh từ URL
+            if (item.getPrimaryImageUrl() != null && !item.getPrimaryImageUrl().isEmpty()) {
+                String fullImageUrl = "http://10.0.2.2:6001" + item.getPrimaryImageUrl();
+                Picasso.get().load(fullImageUrl).into(productImage);
+            } else {
+                String defaultImageUrl = "https://via.placeholder.com/150";
+                Picasso.get().load(defaultImageUrl).into(productImage);
+            }
 
             // Đổi màu nếu hết hàng
             if (warehouseIds == null || warehouseIds.isEmpty()) {
@@ -166,6 +179,8 @@ public class CartAdapter extends ArrayAdapter<Item> {
                     productQuantity.clearFocus();  // Để thực hiện tính toán ngay khi người dùng nhấn vào nút "-"
                 }
             });
+        } else {
+            Log.e(TAG, "getView: Item is null at position " + position);
         }
 
         return convertView;
