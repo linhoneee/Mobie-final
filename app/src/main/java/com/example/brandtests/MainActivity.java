@@ -14,6 +14,7 @@ import androidx.lifecycle.ViewModelProvider;
 import com.example.brandtests.Login.LoginActivity;
 import com.example.brandtests.view.BrandActivity;
 import com.example.brandtests.view.CartActivity;
+import com.example.brandtests.view.ChatActivity; // Import ChatActivity
 import com.example.brandtests.view.ProductActivity;
 import com.example.brandtests.viewmodel.CartViewModel;
 import com.example.brandtests.viewmodel.CartViewModelFactory;
@@ -22,7 +23,7 @@ import com.example.brandtests.service.CartRetrofitClient;
 public class MainActivity extends AppCompatActivity {
 
     private SharedPreferences sharedPreferences;
-    private Button loginButton, logoutButton, brandButton, productButton, cartButton;
+    private Button loginButton, logoutButton, brandButton, productButton, cartButton, chatButton;
     private CartViewModel cartViewModel;
 
     @Override
@@ -36,6 +37,7 @@ public class MainActivity extends AppCompatActivity {
         brandButton = findViewById(R.id.buttonBrand);
         productButton = findViewById(R.id.buttonProducts);
         cartButton = findViewById(R.id.buttonCart);
+        chatButton = findViewById(R.id.buttonChat); // Nút Chat
 
         // Khởi tạo SharedPreferences
         sharedPreferences = getSharedPreferences("LoginPrefs", Context.MODE_PRIVATE);
@@ -74,6 +76,18 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(MainActivity.this, "User not logged in!", Toast.LENGTH_SHORT).show();
             }
         });
+
+        // Sự kiện click vào nút Chat
+        chatButton.setOnClickListener(v -> {
+            Long userId = getUserIdFromPreferences();
+            if (userId != null && userId != -1) {
+                Intent intent = new Intent(MainActivity.this, ChatActivity.class);
+                intent.putExtra("userId", userId); // Truyền userId vào ChatActivity
+                startActivity(intent);
+            } else {
+                Toast.makeText(MainActivity.this, "User not logged in!", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private Long getUserIdFromPreferences() {
@@ -86,10 +100,12 @@ public class MainActivity extends AppCompatActivity {
             loginButton.setVisibility(View.GONE);
             logoutButton.setVisibility(View.VISIBLE);
             cartButton.setVisibility(View.VISIBLE);
+            chatButton.setVisibility(View.VISIBLE); // Hiển thị nút Chat nếu đã đăng nhập
         } else {
             loginButton.setVisibility(View.VISIBLE);
             logoutButton.setVisibility(View.GONE);
             cartButton.setVisibility(View.GONE);
+            chatButton.setVisibility(View.GONE); // Ẩn nút Chat nếu chưa đăng nhập
         }
         brandButton.setVisibility(View.VISIBLE);
         productButton.setVisibility(View.VISIBLE);

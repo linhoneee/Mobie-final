@@ -1,35 +1,80 @@
-<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal"
+    android:orientation="vertical"
     android:padding="8dp">
 
-    <TextView
-        android:id="@+id/cartProductName"
-        android:layout_width="0dp"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="2"
-        android:textSize="16sp" />
+        android:orientation="horizontal"
+        android:weightSum="3">
+
+        <TextView
+            android:id="@+id/cartProductName"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:textSize="16sp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:paddingEnd="4dp" />
+
+        <TextView
+            android:id="@+id/cartProductPrice"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textSize="14sp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:paddingEnd="4dp" />
+    </LinearLayout>
 
     <TextView
-        android:id="@+id/cartProductPrice"
-        android:layout_width="0dp"
+        android:id="@+id/cartProductWarehouseIds"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:textSize="14sp" />
+        android:textSize="14sp"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:paddingEnd="4dp" />
 
-    <TextView
-        android:id="@+id/cartProductQuantity"
-        android:layout_width="0dp"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:textSize="14sp" />
+        android:orientation="horizontal"
+        android:weightSum="3">
 
-    <Button
-        android:id="@+id/cartIncreaseQuantityButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="+" />
+        <Button
+            android:id="@+id/cartIncreaseQuantityButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.5"
+            android:text="+"
+            android:padding="4dp" />
+
+        <EditText
+            android:id="@+id/cartProductQuantity"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.8"
+            android:inputType="number"
+        android:textSize="14sp"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:paddingEnd="4dp" />
+
+
+
+        <Button
+            android:id="@+id/cartReduceQuantityButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.5"
+        android:text="-"
+        android:padding="4dp" />
+    </LinearLayout>
+
 
 </LinearLayout>

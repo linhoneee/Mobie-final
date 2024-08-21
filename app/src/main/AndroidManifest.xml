@@ -40,6 +40,7 @@
             android:exported="true" />
         <activity android:name=".view.CartActivity"
             android:exported="true" />
+        <activity android:name=".view.ChatActivity" />
 
     </application>
 
