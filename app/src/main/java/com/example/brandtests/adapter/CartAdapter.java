@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -25,11 +26,10 @@ import com.example.brandtests.model.Item;
 import com.example.brandtests.viewmodel.CartViewModel;
 import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import android.text.Editable;
-import android.text.TextWatcher;
 
 public class CartAdapter extends ArrayAdapter<Item> {
 
@@ -37,6 +37,7 @@ public class CartAdapter extends ArrayAdapter<Item> {
     private CartViewModel cartViewModel;
     private Long userId;
     private Map<Long, String> itemWarehouseIdsMap;
+    private List<Item> selectedItems = new ArrayList<>(); // Danh sách sản phẩm đã chọn
 
     public CartAdapter(@NonNull Context context, @NonNull List<Item> items, Long userId, List<Inventory> inventories) {
         super(context, 0, items);
@@ -79,6 +80,7 @@ public class CartAdapter extends ArrayAdapter<Item> {
             Button increaseQuantityButton = convertView.findViewById(R.id.cartIncreaseQuantityButton);
             Button reduceQuantityButton = convertView.findViewById(R.id.cartReduceQuantityButton);
             ImageView productImage = convertView.findViewById(R.id.cartProductImage);
+            CheckBox productCheckbox = convertView.findViewById(R.id.cartProductCheckbox);
 
             productName.setText(item.getName());
             productPrice.setText("Price: $" + item.getPrice().toString());
@@ -99,84 +101,64 @@ public class CartAdapter extends ArrayAdapter<Item> {
                 convertView.setBackgroundColor(Color.RED);
                 increaseQuantityButton.setEnabled(false);
                 reduceQuantityButton.setEnabled(false);
-
+                productCheckbox.setEnabled(false);
             } else {
                 convertView.setBackgroundColor(Color.WHITE);
                 increaseQuantityButton.setEnabled(true);
                 reduceQuantityButton.setEnabled(true);
-
+                productCheckbox.setEnabled(true);
             }
 
-            // Lưu lại số lượng ban đầu
-            final int[] originalQuantity = {item.getQuantity()};
-
-            // Sử dụng TextWatcher để theo dõi thay đổi số lượng
-            productQuantity.addTextChangedListener(new TextWatcher() {
-                @Override
-                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                }
-
-                @Override
-                public void onTextChanged(CharSequence s, int start, int before, int count) {
-                }
-
-                @Override
-                public void afterTextChanged(Editable s) {
-                    // Chỉ xử lý khi EditText này mất tiêu điểm
-                }
-            });
-
-            // Sự kiện khi EditText mất tiêu điểm
-            productQuantity.setOnFocusChangeListener((v, hasFocus) -> {
-                if (!hasFocus) {
-                    String input = productQuantity.getText().toString();
-                    if (!input.isEmpty()) {
-                        int newQuantity = Integer.parseInt(input);
-                        int difference = newQuantity - originalQuantity[0];
-
-                        if (difference > 0) {
-                            // Số lượng tăng, gọi addItemToCart với số lượng chênh lệch
-                            Item newItem = new Item(
-                                    item.getProductId(),
-                                    item.getName(),
-                                    item.getPrice(),
-                                    difference, // Số lượng thêm vào là sự khác biệt
-                                    item.getWeight(),
-                                    item.getPrimaryImageUrl()
-                            );
-                            cartViewModel.addItemToCart(userId, newItem);
-                        } else if (difference < 0) {
-                            // Số lượng giảm, gọi removeItemFromCart với số lượng chênh lệch
-                            Item newItem = new Item(
-                                    item.getProductId(),
-                                    item.getName(),
-                                    item.getPrice(),
-                                    Math.abs(difference), // Số lượng xóa là giá trị tuyệt đối của sự khác biệt
-                                    item.getWeight(),
-                                    item.getPrimaryImageUrl()
-                            );
-                            cartViewModel.removeItemFromCart(userId, newItem);
-                        }
-
-                        // Cập nhật số lượng ban đầu
-                        originalQuantity[0] = newQuantity;
-                    }
+            // Sự kiện click vào checkbox
+            productCheckbox.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                if (isChecked) {
+                    selectedItems.add(item);
+                } else {
+                    selectedItems.remove(item);
                 }
             });
 
             // Sự kiện click vào nút "+" để tăng số lượng của sản phẩm
             increaseQuantityButton.setOnClickListener(v -> {
                 int newQuantity = item.getQuantity() + 1;
+                item.setQuantity(newQuantity); // Cập nhật số lượng sản phẩm
+
+                // Gọi API để thêm sản phẩm vào giỏ hàng
+                Item newItem = new Item(
+                        item.getProductId(),
+                        item.getName(),
+                        item.getPrice(),
+                        1, // Thêm một sản phẩm
+                        item.getWeight(),
+                        item.getPrimaryImageUrl()
+                );
+                cartViewModel.addItemToCart(userId, newItem);
+
+                // Cập nhật lại giao diện
                 productQuantity.setText(String.valueOf(newQuantity));
-                productQuantity.clearFocus();  // Để thực hiện tính toán ngay khi người dùng nhấn vào nút "+"
             });
 
-            // Sự kiện click vào nút "-"
+            // Sự kiện click vào nút "-" để giảm số lượng của sản phẩm
             reduceQuantityButton.setOnClickListener(v -> {
                 int newQuantity = item.getQuantity() - 1;
                 if (newQuantity > 0) {
+                    item.setQuantity(newQuantity); // Cập nhật số lượng sản phẩm
+
+                    // Gọi API để xóa sản phẩm khỏi giỏ hàng
+                    Item newItem = new Item(
+                            item.getProductId(),
+                            item.getName(),
+                            item.getPrice(),
+                            1, // Giảm một sản phẩm
+                            item.getWeight(),
+                            item.getPrimaryImageUrl()
+                    );
+                    cartViewModel.removeItemFromCart(userId, newItem);
+
+                    // Cập nhật lại giao diện
                     productQuantity.setText(String.valueOf(newQuantity));
-                    productQuantity.clearFocus();  // Để thực hiện tính toán ngay khi người dùng nhấn vào nút "-"
+                } else {
+                    Toast.makeText(getContext(), "Số lượng không thể nhỏ hơn 1", Toast.LENGTH_SHORT).show();
                 }
             });
         } else {
@@ -184,5 +166,13 @@ public class CartAdapter extends ArrayAdapter<Item> {
         }
 
         return convertView;
+    }
+
+    public List<Item> getSelectedItems() {
+        return selectedItems;
+    }
+
+    public Map<Long, String> getItemWarehouseIdsMap() {
+        return itemWarehouseIdsMap;
     }
 }
