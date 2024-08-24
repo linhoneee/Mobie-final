@@ -1,11 +1,11 @@
 package com.example.brandtests.view;
 
 import android.app.AlertDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -17,20 +17,22 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.example.brandtests.R;
 import com.example.brandtests.adapter.CartAdapter;
-import com.example.brandtests.model.Inventory;
 import com.example.brandtests.model.Item;
 import com.example.brandtests.service.CartRetrofitClient;
 import com.example.brandtests.service.InventoryRetrofitClient;
 import com.example.brandtests.viewmodel.CartViewModel;
+import com.example.brandtests.viewmodel.CheckoutViewModel;
 import com.example.brandtests.viewmodel.CartWithInventoryViewModelFactory;
 import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 public class CartActivity extends AppCompatActivity {
 
     private CartViewModel cartViewModel;
+    private CheckoutViewModel checkoutViewModel;
     private Long userId;
     private CartAdapter adapter;
 
@@ -44,10 +46,11 @@ public class CartActivity extends AppCompatActivity {
 
         userId = getIntent().getLongExtra("userId", -1);
 
-        // Sử dụng CartWithInventoryViewModelFactory để khởi tạo CartViewModel
         cartViewModel = new ViewModelProvider(this,
                 new CartWithInventoryViewModelFactory(CartRetrofitClient.getCartService(), InventoryRetrofitClient.getInventoryService()))
                 .get(CartViewModel.class);
+
+        checkoutViewModel = new ViewModelProvider(this).get(CheckoutViewModel.class);
 
         if (userId != -1) {
             cartViewModel.fetchCart(userId);
@@ -82,62 +85,73 @@ public class CartActivity extends AppCompatActivity {
     }
 
     private void showCheckoutDialog(List<Item> selectedItems) {
-        // Inflate layout for dialog
-        LayoutInflater inflater = LayoutInflater.from(this);
-        View dialogView = inflater.inflate(R.layout.dialog_checkout, null);
-
-        LinearLayout productsContainer = dialogView.findViewById(R.id.dialogProductsContainer);
-
-        // Lấy itemWarehouseIdsMap từ adapter
         Map<Long, String> itemWarehouseIdsMap = adapter.getItemWarehouseIdsMap();
 
-        // Add each selected product to the dialog
-        for (Item item : selectedItems) {
-            View productView = inflater.inflate(R.layout.cart_item, null);
+        // Gọi phương thức groupItemsByWarehouse từ ViewModel
+        checkoutViewModel.groupItemsByWarehouse(selectedItems, itemWarehouseIdsMap);
 
-            ImageView productImage = productView.findViewById(R.id.cartProductImage);
-            TextView productName = productView.findViewById(R.id.cartProductName);
-            TextView productPrice = productView.findViewById(R.id.cartProductPrice);
-            TextView productQuantity = productView.findViewById(R.id.cartProductQuantity);
-            TextView productWarehouseIds = productView.findViewById(R.id.cartProductWarehouseIds);
-            Button increaseQuantityButton = productView.findViewById(R.id.cartIncreaseQuantityButton);
-            Button reduceQuantityButton = productView.findViewById(R.id.cartReduceQuantityButton);
-            CheckBox productCheckbox = productView.findViewById(R.id.cartProductCheckbox);
+        checkoutViewModel.getWarehouseGroups().observe(this, warehouseGroups -> {
+            if (warehouseGroups == null) return;
 
-            // Hide the checkbox, buttons, and EditText in the dialog
-            productCheckbox.setVisibility(View.GONE);
-            increaseQuantityButton.setVisibility(View.GONE);
-            reduceQuantityButton.setVisibility(View.GONE);
-            productQuantity.setFocusable(false); // Prevent editing in dialog
-            productQuantity.setClickable(false); // Prevent clicking on EditText
+            // Inflate layout cho dialog
+            LayoutInflater inflater = LayoutInflater.from(this);
+            View dialogView = inflater.inflate(R.layout.dialog_checkout, null);
 
-            // Set product details
-            productName.setText(item.getName());
-            productPrice.setText("Price: $" + item.getPrice().toString());
-            productQuantity.setText("Quantity: " + item.getQuantity());
-            productWarehouseIds.setText("Warehouse IDs: " + (itemWarehouseIdsMap.get(item.getProductId()) != null ? itemWarehouseIdsMap.get(item.getProductId()) : "N/A"));
+            LinearLayout productsContainer = dialogView.findViewById(R.id.dialogProductsContainer);
 
-            // Load product image
-            if (item.getPrimaryImageUrl() != null && !item.getPrimaryImageUrl().isEmpty()) {
-                String fullImageUrl = "http://10.0.2.2:6001" + item.getPrimaryImageUrl();
-                Picasso.get().load(fullImageUrl).into(productImage);
-            } else {
-                String defaultImageUrl = "https://via.placeholder.com/150";
-                Picasso.get().load(defaultImageUrl).into(productImage);
+            // Add từng nhóm warehouse vào container
+            for (Map.Entry<String, List<Item>> entry : warehouseGroups.entrySet()) {
+                String warehouseId = entry.getKey();
+                List<Item> itemsInGroup = entry.getValue();
+
+                // Tạo layout cho từng nhóm warehouse
+                View groupView = inflater.inflate(R.layout.warehouse_group_item, null);
+                TextView warehouseTitle = groupView.findViewById(R.id.warehouseTitle);
+                LinearLayout groupItemsContainer = groupView.findViewById(R.id.groupItemsContainer);
+
+                warehouseTitle.setText("Warehouse ID: " + warehouseId);
+
+                for (Item item : itemsInGroup) {
+                    View productView = inflater.inflate(R.layout.checkout_item, null);
+
+                    ImageView productImage = productView.findViewById(R.id.checkoutProductImage);
+                    TextView productName = productView.findViewById(R.id.checkoutProductName);
+                    TextView productPrice = productView.findViewById(R.id.checkoutProductPrice);
+                    TextView productQuantity = productView.findViewById(R.id.checkoutProductQuantity);
+
+                    productName.setText(item.getName());
+                    productPrice.setText("Price: $" + item.getPrice().toString());
+                    productQuantity.setText("Quantity: " + item.getQuantity());
+
+                    if (item.getPrimaryImageUrl() != null && !item.getPrimaryImageUrl().isEmpty()) {
+                        String fullImageUrl = "http://10.0.2.2:6001" + item.getPrimaryImageUrl();
+                        Picasso.get().load(fullImageUrl).into(productImage);
+                    } else {
+                        String defaultImageUrl = "https://via.placeholder.com/150";
+                        Picasso.get().load(defaultImageUrl).into(productImage);
+                    }
+
+                    groupItemsContainer.addView(productView);
+                }
+
+                // Thêm sự kiện click vào toàn bộ nhóm để chọn
+                groupView.setOnClickListener(v -> {
+                    checkoutViewModel.setSelectedWarehouseId(warehouseId);
+
+                    Intent intent = new Intent(CartActivity.this, CheckoutPage.class);
+                    intent.putExtra("selectedWarehouseId", warehouseId);
+                    intent.putParcelableArrayListExtra("selectedGroupItems", new ArrayList<>(itemsInGroup));
+                    startActivity(intent);
+                });
+
+                // Thêm nhóm vào container chính
+                productsContainer.addView(groupView);
             }
 
-            // Add productView to the container
-            productsContainer.addView(productView);
-        }
-
-        // Create and show dialog
-        new AlertDialog.Builder(this)
-                .setView(dialogView)
-                .setPositiveButton("Checkout", (dialog, which) -> {
-                    // Handle checkout action
-                    Toast.makeText(CartActivity.this, "Proceeding to checkout...", Toast.LENGTH_SHORT).show();
-                })
-                .setNegativeButton("Cancel", null)
-                .show();
+            new AlertDialog.Builder(this)
+                    .setView(dialogView)
+                    .setNegativeButton("Cancel", null)
+                    .show();
+        });
     }
 }

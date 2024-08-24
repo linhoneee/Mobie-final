@@ -16,14 +16,10 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.lifecycle.LifecycleOwner;
-import androidx.lifecycle.ViewModelProvider;
-import androidx.lifecycle.ViewModelStoreOwner;
 
 import com.example.brandtests.R;
 import com.example.brandtests.model.Inventory;
 import com.example.brandtests.model.Item;
-import com.example.brandtests.viewmodel.CartViewModel;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -34,32 +30,24 @@ import java.util.stream.Collectors;
 public class CartAdapter extends ArrayAdapter<Item> {
 
     private static final String TAG = "CartAdapter";
-    private CartViewModel cartViewModel;
     private Long userId;
     private Map<Long, String> itemWarehouseIdsMap;
-    private List<Item> selectedItems = new ArrayList<>(); // Danh sách sản phẩm đã chọn
+    private List<Item> selectedItems = new ArrayList<>();
 
+    // Constructor không cần CartViewModel
     public CartAdapter(@NonNull Context context, @NonNull List<Item> items, Long userId, List<Inventory> inventories) {
         super(context, 0, items);
         this.userId = userId;
-        cartViewModel = new ViewModelProvider((ViewModelStoreOwner) context).get(CartViewModel.class);
 
         // Xử lý các inventories và tạo Map chứa warehouseIds cho mỗi sản phẩm
-        itemWarehouseIdsMap = inventories.stream()
+        itemWarehouseIdsMap = inventories != null ? inventories.stream()
                 .collect(Collectors.groupingBy(
                         Inventory::getProductId,
                         Collectors.mapping(
                                 inventory -> inventory.getWarehouseId().toString(),
                                 Collectors.joining(",")
                         )
-                ));
-
-        // Lắng nghe kết quả thêm vào giỏ hàng và hiển thị thông báo
-        cartViewModel.getAddItemResult().observe((LifecycleOwner) context, result -> {
-            if (result != null && !result.isEmpty()) {
-                Toast.makeText(context, result, Toast.LENGTH_SHORT).show();
-            }
-        });
+                )) : null;
     }
 
     @NonNull
@@ -70,7 +58,7 @@ public class CartAdapter extends ArrayAdapter<Item> {
         }
 
         Item item = getItem(position);
-        String warehouseIds = itemWarehouseIdsMap.get(item.getProductId());
+        String warehouseIds = itemWarehouseIdsMap != null ? itemWarehouseIdsMap.get(item.getProductId()) : null;
 
         if (item != null) {
             TextView productName = convertView.findViewById(R.id.cartProductName);
@@ -109,7 +97,6 @@ public class CartAdapter extends ArrayAdapter<Item> {
                 reduceQuantityButton.setEnabled(true);
                 productCheckbox.setEnabled(true);
                 productQuantity.setEnabled(true);
-
             }
 
             // Sự kiện click vào checkbox
@@ -126,17 +113,6 @@ public class CartAdapter extends ArrayAdapter<Item> {
                 int newQuantity = item.getQuantity() + 1;
                 item.setQuantity(newQuantity); // Cập nhật số lượng sản phẩm
 
-                // Gọi API để thêm sản phẩm vào giỏ hàng
-                Item newItem = new Item(
-                        item.getProductId(),
-                        item.getName(),
-                        item.getPrice(),
-                        1, // Thêm một sản phẩm
-                        item.getWeight(),
-                        item.getPrimaryImageUrl()
-                );
-                cartViewModel.addItemToCart(userId, newItem);
-
                 // Cập nhật lại giao diện
                 productQuantity.setText(String.valueOf(newQuantity));
             });
@@ -146,17 +122,6 @@ public class CartAdapter extends ArrayAdapter<Item> {
                 int newQuantity = item.getQuantity() - 1;
                 if (newQuantity > 0) {
                     item.setQuantity(newQuantity); // Cập nhật số lượng sản phẩm
-
-                    // Gọi API để xóa sản phẩm khỏi giỏ hàng
-                    Item newItem = new Item(
-                            item.getProductId(),
-                            item.getName(),
-                            item.getPrice(),
-                            1, // Giảm một sản phẩm
-                            item.getWeight(),
-                            item.getPrimaryImageUrl()
-                    );
-                    cartViewModel.removeItemFromCart(userId, newItem);
 
                     // Cập nhật lại giao diện
                     productQuantity.setText(String.valueOf(newQuantity));
