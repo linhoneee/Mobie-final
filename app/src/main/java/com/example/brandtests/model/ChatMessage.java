@@ -1,5 +1,6 @@
 package com.example.brandtests.model;
 
+
 import java.time.LocalDateTime;
 
 public class ChatMessage {
@@ -11,8 +12,21 @@ public class ChatMessage {
     private Long roomId;
     private Boolean unRead;
     private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 
-    // Getters and Setters
+    // Constructor không tham số
+    public ChatMessage() {}
+
+    // Constructor với tham số
+    public ChatMessage(String text, Long userId, Long roomId, String username) {
+        this.text = text;
+        this.userId = userId;
+        this.roomId = roomId;
+        this.username = username;
+        this.createdAt = LocalDateTime.now();
+    }
+
+    // Getters và Setters
     public Long getId() {
         return id;
     }
@@ -75,5 +89,13 @@ public class ChatMessage {
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
     }
 }

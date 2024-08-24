@@ -102,11 +102,14 @@ public class CartAdapter extends ArrayAdapter<Item> {
                 increaseQuantityButton.setEnabled(false);
                 reduceQuantityButton.setEnabled(false);
                 productCheckbox.setEnabled(false);
+                productQuantity.setEnabled(false);
             } else {
                 convertView.setBackgroundColor(Color.WHITE);
                 increaseQuantityButton.setEnabled(true);
                 reduceQuantityButton.setEnabled(true);
                 productCheckbox.setEnabled(true);
+                productQuantity.setEnabled(true);
+
             }
 
             // Sự kiện click vào checkbox
