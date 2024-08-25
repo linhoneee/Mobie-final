@@ -11,8 +11,7 @@ public class ChatMessage {
     private String role;
     private Long roomId;
     private Boolean unRead;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
+
 
     // Constructor không tham số
     public ChatMessage() {}
@@ -23,7 +22,6 @@ public class ChatMessage {
         this.userId = userId;
         this.roomId = roomId;
         this.username = username;
-        this.createdAt = LocalDateTime.now();
     }
 
     // Getters và Setters
@@ -83,19 +81,5 @@ public class ChatMessage {
         this.unRead = unRead;
     }
 
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
 
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
-    }
 }

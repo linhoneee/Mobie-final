@@ -17,7 +17,7 @@ public class WebSocketService {
         webSocketClient.sendMessage(jsonMessage);
     }
 
-    public void connectWebSocket() {
-        webSocketClient.connect();
+    public void connectWebSocket(Long userId) {
+        webSocketClient.connect(userId);  // Kết nối với userId
     }
 }

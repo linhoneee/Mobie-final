@@ -5,11 +5,10 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.WebSocket;
 import okhttp3.WebSocketListener;
-import okio.ByteString;
 
 public class WebSocketClient {
 
-    private static final String TAG = "WebSocketClient";  // Tag cho logs
+    private static final String TAG = "WebSocketClient";
     private WebSocket webSocket;
     private OkHttpClient client;
     private MessageCallback callback;
@@ -22,9 +21,12 @@ public class WebSocketClient {
         this.callback = callback;
     }
 
-    public void connect() {
+    public void connect(Long userId) {
         client = new OkHttpClient();
-        Request request = new Request.Builder().url("ws://10.0.2.2:6010/native-ws").build();
+        Request request = new Request.Builder()
+                .url("ws://10.0.2.2:6010/native-ws")
+                .addHeader("RoomID", userId.toString())  // Truyền RoomID qua tiêu đề
+                .build();
         webSocket = client.newWebSocket(request, new WebSocketListener() {
             @Override
             public void onOpen(WebSocket webSocket, okhttp3.Response response) {
