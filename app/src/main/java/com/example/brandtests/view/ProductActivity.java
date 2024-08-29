@@ -1,5 +1,7 @@
 package com.example.brandtests.view;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -24,14 +26,24 @@ public class ProductActivity extends AppCompatActivity {
 
     private ProductViewModel productViewModel;
     private CartViewModel cartViewModel;
-    private Long userId = 1L; // Giả sử userId là 1, bạn có thể lấy từ SharedPreferences hoặc Intent
+    private SharedPreferences sharedPreferences;
+    private Long userId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_product);
 
+        sharedPreferences = getSharedPreferences("LoginPrefs", Context.MODE_PRIVATE);
+        userId = sharedPreferences.getLong("UserID", -1);
+
         ListView listView = findViewById(R.id.listViewProducts);
+
+        if (userId == -1) {
+            Toast.makeText(this, "Invalid user ID", Toast.LENGTH_SHORT).show();
+            finish();
+            return;
+        }
 
         productViewModel = new ViewModelProvider(this, new ProductViewModelFactory(RetrofitClient.getProductService()))
                 .get(ProductViewModel.class);
