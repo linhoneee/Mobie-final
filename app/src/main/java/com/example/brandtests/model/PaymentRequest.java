@@ -9,15 +9,17 @@ public class PaymentRequest {
     private Shipping selectedShipping;
     private DistanceData distanceData;
     private Double total;
+    private String platform; // Thêm tham số platform để xác định nền tảng
 
     // Constructors
-    public PaymentRequest(Long id, Integer userId, List<Item> items, DistanceData distanceData, Double total) {
+    public PaymentRequest(Long id, Integer userId, List<Item> items, DistanceData distanceData, Double total, String platform) {
         this.id = id;
         this.userId = userId;
         this.items = items;
         this.distanceData = distanceData;
         this.total = total;
         this.selectedShipping = new Shipping();  // Gán một đối tượng trống
+        this.platform = platform; // Gán giá trị platform
     }
 
     // Getters and setters
@@ -67,5 +69,13 @@ public class PaymentRequest {
 
     public void setTotal(Double total) {
         this.total = total;
+    }
+
+    public String getPlatform() {
+        return platform;
+    }
+
+    public void setPlatform(String platform) {
+        this.platform = platform;
     }
 }

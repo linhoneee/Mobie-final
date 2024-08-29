@@ -117,7 +117,8 @@ public class CheckoutPage extends AppCompatActivity {
                                 userId.intValue(),
                                 selectedGroupItems,
                                 distanceData,  // Sử dụng DistanceData đã chuyển đổi
-                                adapter.getTotalPrice()
+                                adapter.getTotalPrice(),
+                                "mobile" // Truyền thêm thông tin về nền tảng
                         );
 
                         PaymentService paymentService = PaymentRetrofitClient.getPaymentService();

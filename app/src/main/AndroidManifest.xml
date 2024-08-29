@@ -43,7 +43,20 @@
         <activity android:name=".view.ChatActivity" />
         <activity android:name=".view.CheckoutPage"></activity>
 
-
+        <!-- Khai báo PaymentSuccessActivity với intent-filter để xử lý deep link -->
+        <activity
+            android:name=".view.PaymentSuccessActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data
+                    android:scheme="yourapp"
+                    android:host="payment"
+                    android:pathPrefix="/success" />
+            </intent-filter>
+        </activity>
     </application>
 
 </manifest>
