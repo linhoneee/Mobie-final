@@ -77,6 +77,9 @@ dependencies {
     implementation("org.java-websocket:Java-WebSocket:1.5.2")
 
 
+    // thư viện để có thể phân tích url payment trả về dưới dạng chuỗi
+    // để tránh Lỗi "Cannot resolve symbol 'ScalarsConverterFactory'"
+    implementation("com.squareup.retrofit2:converter-scalars:2.9.0")
 
     // Testing dependencies
     testImplementation("junit:junit:4.13.2")
