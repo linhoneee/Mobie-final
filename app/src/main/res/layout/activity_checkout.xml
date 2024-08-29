@@ -1,11 +1,9 @@
-<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:padding="16dp">
 
-    <!-- Tiêu đề Checkout -->
     <TextView
         android:id="@+id/checkoutTitle"
         android:layout_width="wrap_content"
@@ -15,7 +13,6 @@
         android:textStyle="bold"
         android:paddingBottom="16dp"/>
 
-    <!-- Text cho danh sách sản phẩm -->
     <TextView
         android:id="@+id/itemLabel"
         android:layout_width="wrap_content"
@@ -25,7 +22,6 @@
         android:textStyle="bold"
         android:paddingBottom="8dp"/>
 
-    <!-- Danh sách sản phẩm đã chọn -->
     <ListView
         android:id="@+id/selectedItemsListView"
         android:layout_width="match_parent"
@@ -33,7 +29,6 @@
         android:divider="@android:color/darker_gray"
         android:dividerHeight="1dp"/>
 
-    <!-- Warehouse ID -->
     <TextView
         android:id="@+id/selectedWarehouseId"
         android:layout_width="wrap_content"
@@ -42,4 +37,59 @@
         android:textSize="18sp"
         android:textStyle="bold"
         android:paddingTop="16dp"/>
+
+    <TextView
+        android:id="@+id/distanceTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Distance: "
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:paddingTop="16dp"/>
+
+    <!-- Thêm các TextView mới cho các thuộc tính còn lại -->
+    <TextView
+        android:id="@+id/tvReceiverName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="16sp"
+        android:paddingTop="4dp"/>
+
+    <TextView
+        android:id="@+id/tvFullAddress"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="16sp"
+        android:paddingTop="4dp"/>
+
+    <TextView
+        android:id="@+id/tvWarehouseName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="16sp"
+        android:paddingTop="4dp"/>
+
+    <TextView
+        android:id="@+id/warehouseAddress"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="16sp"
+        android:paddingTop="4dp"/>
+
+    <TextView
+        android:id="@+id/route"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="16sp"
+        android:paddingTop="4dp"/>
+
+    <TextView
+        android:id="@+id/totalTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Tổng tiền: "
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:paddingTop="16dp"/>
+
 </LinearLayout>

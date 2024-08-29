@@ -1,61 +1,73 @@
 package com.example.brandtests.view;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import androidx.appcompat.app.AppCompatActivity;
-
+import androidx.lifecycle.ViewModelProvider;
 import com.example.brandtests.R;
 import com.example.brandtests.adapter.CheckoutAdapter;
 import com.example.brandtests.model.Item;
-
+import com.example.brandtests.viewmodel.CheckoutViewModel;
+import java.util.Arrays;
 import java.util.List;
 
 public class CheckoutPage extends AppCompatActivity {
-
-    private static final String TAG = "CheckoutPage";
-    private String selectedWarehouseId;
-    private List<Item> selectedGroupItems;
+    private CheckoutViewModel viewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_checkout);
 
-        // Nhận dữ liệu từ Intent
-        selectedWarehouseId = getIntent().getStringExtra("selectedWarehouseId");
-        selectedGroupItems = getIntent().getParcelableArrayListExtra("selectedGroupItems");
+        viewModel = new ViewModelProvider(this).get(CheckoutViewModel.class);
 
-        // Log dữ liệu để kiểm tra
-        Log.d(TAG, "Selected Warehouse ID: " + selectedWarehouseId);
-        if (selectedGroupItems != null) {
-            Log.d(TAG, "Number of selected items: " + selectedGroupItems.size());
-        } else {
-            Log.e(TAG, "Selected group items is null");
-        }
+        TextView warehouseIdTextView = findViewById(R.id.selectedWarehouseId);
+        ListView selectedItemsListView = findViewById(R.id.selectedItemsListView);
+        TextView distanceTextView = findViewById(R.id.distanceTextView);
+        TextView tvReceiverName = findViewById(R.id.tvReceiverName);
+        TextView tvFullAddress = findViewById(R.id.tvFullAddress);
+        TextView tvWarehouseName = findViewById(R.id.tvWarehouseName);
+        TextView warehouseAddress = findViewById(R.id.warehouseAddress);
+        TextView route = findViewById(R.id.route);
+        TextView totalTextView = findViewById(R.id.totalTextView);  // Thêm dòng này
 
-        // Kiểm tra xem dữ liệu có được nhận chính xác không
-        if (selectedWarehouseId == null || selectedGroupItems == null) {
-            Toast.makeText(this, "Data not received correctly", Toast.LENGTH_SHORT).show();
+        SharedPreferences sharedPreferences = getSharedPreferences("LoginPrefs", Context.MODE_PRIVATE);
+        Long userId = sharedPreferences.getLong("UserID", -1);
+        if (userId == -1) {
+            Toast.makeText(this, "Invalid user ID", Toast.LENGTH_SHORT).show();
             finish();
             return;
         }
 
-        // Hiển thị dữ liệu lên giao diện người dùng
-        TextView warehouseIdTextView = findViewById(R.id.selectedWarehouseId);
-        TextView checkoutTitle = findViewById(R.id.checkoutTitle);
-        TextView itemLabel = findViewById(R.id.itemLabel);
-        ListView selectedItemsListView = findViewById(R.id.selectedItemsListView);
+        String selectedWarehouseId = getIntent().getStringExtra("selectedWarehouseId");
+        List<Long> warehouseIds = Arrays.asList(Long.parseLong(selectedWarehouseId));
+        viewModel.calculateDistance(userId, warehouseIds);
 
-        checkoutTitle.setText("Checkout");
-        itemLabel.setText("Item");
-        warehouseIdTextView.setText("Warehouse ID: " + selectedWarehouseId);
+        viewModel.getDistanceRecord().observe(this, distanceRecord -> {
+            if (distanceRecord != null) {
+                tvReceiverName.setText("Receiver Name: " + distanceRecord.getReceiverName());
+                String fullAddress = distanceRecord.getProvinceCity() + ", " + distanceRecord.getDistrict() + ", " +
+                        distanceRecord.getWard() + ", " + distanceRecord.getStreet();
+                tvFullAddress.setText("Address: " + fullAddress);
+                tvWarehouseName.setText("Warehouse Name: " + distanceRecord.getWarehouseName());
+                distanceTextView.setText("Distance: " + distanceRecord.getDistance() + " km");
+                String warehouseFullAddress = distanceRecord.getWarehouseProvinceCity() + ", " + distanceRecord.getWarehouseDistrict() + ", " +
+                        distanceRecord.getWarehouseWard() ;
+                warehouseAddress.setText("Address: " + warehouseFullAddress);
+                route.setText("route: " + distanceRecord.getRoute());
+            } else {
+                distanceTextView.setText("Failed to fetch distance data");
+            }
+        });
 
-        // Sử dụng CheckoutAdapter để hiển thị danh sách các sản phẩm đã chọn
+        List<Item> selectedGroupItems = getIntent().getParcelableArrayListExtra("selectedGroupItems");
         CheckoutAdapter adapter = new CheckoutAdapter(this, selectedGroupItems);
         selectedItemsListView.setAdapter(adapter);
+        warehouseIdTextView.setText("Warehouse ID: " + selectedWarehouseId);
+        totalTextView.setText("Tổng tiền: $" + String.format("%.2f", adapter.getTotalPrice()));  // Thêm dòng này
     }
 }

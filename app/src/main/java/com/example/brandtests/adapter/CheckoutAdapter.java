@@ -15,12 +15,26 @@ import com.example.brandtests.R;
 import com.example.brandtests.model.Item;
 import com.squareup.picasso.Picasso;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 public class CheckoutAdapter extends ArrayAdapter<Item> {
+    private BigDecimal totalPrice = BigDecimal.ZERO;  // Sử dụng BigDecimal để đảm bảo tính chính xác
 
     public CheckoutAdapter(@NonNull Context context, @NonNull List<Item> items) {
         super(context, 0, items);
+        calculateTotalPrice(items);
+    }
+
+    private void calculateTotalPrice(List<Item> items) {
+        totalPrice = BigDecimal.ZERO;
+        for (Item item : items) {
+            totalPrice = totalPrice.add(item.getPrice().multiply(new BigDecimal(item.getQuantity())));
+        }
+    }
+
+    public double getTotalPrice() {
+        return totalPrice.doubleValue();  // Trả về giá trị double từ BigDecimal
     }
 
     @NonNull
@@ -39,10 +53,9 @@ public class CheckoutAdapter extends ArrayAdapter<Item> {
             ImageView productImage = convertView.findViewById(R.id.checkoutProductImage);
 
             productName.setText(item.getName());
-            productPrice.setText("Price: $" + item.getPrice().toString());
-            productQuantity.setText("Quantity: " + item.getQuantity());
+            productPrice.setText("Giá: $" + String.format("%.2f", item.getPrice()));
+            productQuantity.setText("Số lượng: " + item.getQuantity());
 
-            // Sử dụng Picasso để tải ảnh từ URL
             if (item.getPrimaryImageUrl() != null && !item.getPrimaryImageUrl().isEmpty()) {
                 String fullImageUrl = "http://10.0.2.2:6001" + item.getPrimaryImageUrl();
                 Picasso.get().load(fullImageUrl).into(productImage);
