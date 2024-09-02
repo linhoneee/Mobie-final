@@ -18,4 +18,8 @@ public class DistanceRetrofitClient {
         }
         return retrofit;
     }
+
+    public static DistanceService getDistanceService() {
+        return getRetrofitInstance().create(DistanceService.class);
+    }
 }

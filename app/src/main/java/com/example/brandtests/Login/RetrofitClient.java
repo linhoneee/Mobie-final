@@ -1,5 +1,7 @@
 package com.example.brandtests.Login;
 
+import com.example.brandtests.service.AddressService;
+
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
@@ -21,4 +23,9 @@ public class RetrofitClient {
     public static UserService getUserService() {
         return getClient().create(UserService.class);
     }
+
+    public static AddressService getAddressService() {
+        return getClient().create(AddressService.class);
+    }
+
 }

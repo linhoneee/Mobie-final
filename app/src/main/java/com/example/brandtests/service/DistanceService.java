@@ -14,4 +14,16 @@ public interface DistanceService {
             @Query("userId") Long userId,
             @Query("warehouseIds") List<Long> warehouseIds
     );
+
+    @GET("/distance/calculateWithFullAddress")
+    Call<DistanceRecord> calculateDistanceWithFullAddress(
+            @Query("receiverName") String receiverName,
+            @Query("street") String street,
+            @Query("ward") String ward,
+            @Query("district") String district,
+            @Query("provinceCity") String provinceCity,
+            @Query("latitude") Double latitude,
+            @Query("longitude") Double longitude,
+            @Query("warehouseIds") List<Long> warehouseIds
+    );
 }
