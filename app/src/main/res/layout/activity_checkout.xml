@@ -8,6 +8,7 @@
         android:orientation="vertical"
         android:padding="16dp">
 
+        <!-- Tiêu đề trang thanh toán -->
         <TextView
             android:id="@+id/checkoutTitle"
             android:layout_width="wrap_content"
@@ -17,6 +18,7 @@
             android:textStyle="bold"
             android:paddingBottom="16dp"/>
 
+        <!-- Nhãn "Item" -->
         <TextView
             android:id="@+id/itemLabel"
             android:layout_width="wrap_content"
@@ -26,6 +28,7 @@
             android:textStyle="bold"
             android:paddingBottom="8dp"/>
 
+        <!-- Danh sách các mặt hàng được chọn -->
         <ListView
             android:id="@+id/selectedItemsListView"
             android:layout_width="match_parent"
@@ -33,6 +36,7 @@
             android:divider="@android:color/darker_gray"
             android:dividerHeight="1dp"/>
 
+        <!-- Hiển thị Warehouse ID -->
         <TextView
             android:id="@+id/selectedWarehouseId"
             android:layout_width="wrap_content"
@@ -42,6 +46,7 @@
             android:textStyle="bold"
             android:paddingTop="16dp"/>
 
+        <!-- Hiển thị khoảng cách từ kho đến địa chỉ giao hàng -->
         <TextView
             android:id="@+id/distanceTextView"
             android:layout_width="wrap_content"
@@ -51,7 +56,7 @@
             android:textStyle="bold"
             android:paddingTop="16dp"/>
 
-        <!-- Thêm TextView mới để hiển thị địa chỉ chính -->
+        <!-- Hiển thị địa chỉ chính -->
         <TextView
             android:id="@+id/primaryAddressTextView"
             android:layout_width="wrap_content"
@@ -61,7 +66,7 @@
             android:textStyle="bold"
             android:paddingTop="16dp"/>
 
-        <!-- Thêm Button để thay đổi địa chỉ -->
+        <!-- Nút để thay đổi địa chỉ chính -->
         <Button
             android:id="@+id/changeAddressButton"
             android:layout_width="wrap_content"
@@ -69,7 +74,71 @@
             android:text="Change Address"
             android:layout_marginTop="8dp"/>
 
-        <!-- Các thành phần khác -->
+        <!-- Spinner để hiển thị danh sách mã giảm giá -->
+        <Spinner
+            android:id="@+id/couponSpinner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"/>
+
+        <!-- Button để áp dụng mã giảm giá -->
+        <Button
+            android:id="@+id/applyCouponButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Apply Coupon"
+            android:layout_marginTop="8dp"
+            android:enabled="false"/> <!-- Nút sẽ chỉ được kích hoạt sau khi chọn mã giảm giá -->
+
+        <!-- TextView để hiển thị tổng tiền sau khi áp dụng mã giảm giá -->
+        <TextView
+            android:id="@+id/discountedTotalTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Discounted Total: "
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:paddingTop="16dp"/>
+
+        <!-- RadioGroup để chọn loại vận chuyển -->
+        <RadioGroup
+            android:id="@+id/shippingRadioGroup"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingTop="16dp">
+            <!-- Các RadioButton sẽ được thêm động trong mã Java -->
+        </RadioGroup>
+
+        <!-- Hiển thị công thức tính và chi phí vận chuyển -->
+        <TextView
+            android:id="@+id/shippingFormulaTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Formula: Shipping Cost = (Price per Km * Distance) + (Price per Kg * Total Weight)"
+            android:textSize="16sp"
+            android:paddingTop="8dp"/>
+
+        <TextView
+            android:id="@+id/shippingCostTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Shipping Total: "
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:paddingTop="8dp"/>
+
+        <!-- Hiển thị tổng chi phí cuối cùng -->
+        <TextView
+            android:id="@+id/totalCostTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Total Cost: "
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:paddingTop="16dp"/>
+
+        <!-- Hiển thị thông tin người nhận và địa chỉ -->
         <TextView
             android:id="@+id/tvReceiverName"
             android:layout_width="wrap_content"
@@ -84,6 +153,7 @@
             android:textSize="16sp"
             android:paddingTop="4dp"/>
 
+        <!-- TextView này cần phải có để tránh lỗi -->
         <TextView
             android:id="@+id/tvWarehouseName"
             android:layout_width="wrap_content"
@@ -105,15 +175,17 @@
             android:textSize="16sp"
             android:paddingTop="4dp"/>
 
+        <!-- Hiển thị tổng tiền sản phẩm -->
         <TextView
             android:id="@+id/totalTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Tổng tiền: "
+            android:text="Product Total: "
             android:textSize="18sp"
             android:textStyle="bold"
             android:paddingTop="16dp"/>
 
+        <!-- Nút thanh toán -->
         <Button
             android:id="@+id/checkoutButton"
             android:layout_width="wrap_content"

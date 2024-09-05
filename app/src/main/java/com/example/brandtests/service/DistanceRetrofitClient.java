@@ -22,4 +22,7 @@ public class DistanceRetrofitClient {
     public static DistanceService getDistanceService() {
         return getRetrofitInstance().create(DistanceService.class);
     }
+    public static ShippingService getShippingService() {
+        return getRetrofitInstance().create(ShippingService.class);
+    }
 }

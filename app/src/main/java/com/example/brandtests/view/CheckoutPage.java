@@ -7,10 +7,15 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ArrayAdapter;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
+import android.widget.Spinner;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -20,25 +25,32 @@ import com.example.brandtests.Login.RetrofitClient;
 import com.example.brandtests.R;
 import com.example.brandtests.adapter.CheckoutAdapter;
 import com.example.brandtests.model.Address;
+import com.example.brandtests.model.ApplyCouponRequest;
+import com.example.brandtests.model.CustomerCoupon;
 import com.example.brandtests.model.DistanceData;
 import com.example.brandtests.model.DistanceRecord;
+import com.example.brandtests.model.DiscountResult;
 import com.example.brandtests.model.Item;
 import com.example.brandtests.model.PaymentRequest;
+import com.example.brandtests.model.Shipping;
 import com.example.brandtests.service.AddressService;
+import com.example.brandtests.service.CustomerCouponRetrofitClient;
+import com.example.brandtests.service.CustomerCouponService;
 import com.example.brandtests.service.DistanceRetrofitClient;
 import com.example.brandtests.service.DistanceService;
 import com.example.brandtests.service.PaymentService;
 import com.example.brandtests.service.PaymentRetrofitClient;
+import com.example.brandtests.service.ShippingService;
 import com.example.brandtests.viewmodel.CheckoutViewModel;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-
 public class CheckoutPage extends AppCompatActivity {
     private CheckoutViewModel viewModel;
     private SharedPreferences sharedPreferences;
@@ -49,6 +61,17 @@ public class CheckoutPage extends AppCompatActivity {
     private Button changeAddressButton;
     private String selectedWarehouseId;
     private List<Item> selectedGroupItems;
+    private Spinner couponSpinner;
+    private String selectedCouponCode;
+    private TextView discountedTotalTextView;
+    private TextView totalTextView;
+    private TextView shippingCostTextView;
+    private TextView totalCostTextView;
+    private Button applyCouponButton;
+    private RadioGroup shippingRadioGroup;
+    private Shipping selectedShipping;
+    private double shippingCost;
+    private CheckoutAdapter adapter; // Khai báo biến adapter ở cấp lớp
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,12 +88,20 @@ public class CheckoutPage extends AppCompatActivity {
         TextView tvWarehouseName = findViewById(R.id.tvWarehouseName);
         TextView warehouseAddress = findViewById(R.id.warehouseAddress);
         TextView route = findViewById(R.id.route);
-        TextView totalTextView = findViewById(R.id.totalTextView);
+        totalTextView = findViewById(R.id.totalTextView);
+        shippingCostTextView = findViewById(R.id.shippingCostTextView);
+        totalCostTextView = findViewById(R.id.totalCostTextView);
+        shippingRadioGroup = findViewById(R.id.shippingRadioGroup);
         Button checkoutButton = findViewById(R.id.checkoutButton);
+        applyCouponButton = findViewById(R.id.applyCouponButton);
 
         // Thêm TextView và Button cho địa chỉ chính
         primaryAddressTextView = findViewById(R.id.primaryAddressTextView);
         changeAddressButton = findViewById(R.id.changeAddressButton);
+
+        // Thêm Spinner và TextView cho mã giảm giá
+        couponSpinner = findViewById(R.id.couponSpinner);
+        discountedTotalTextView = findViewById(R.id.discountedTotalTextView);
 
         sharedPreferences = getSharedPreferences("LoginPrefs", Context.MODE_PRIVATE);
         userId = sharedPreferences.getLong("UserID", -1);
@@ -84,10 +115,10 @@ public class CheckoutPage extends AppCompatActivity {
 
         selectedWarehouseId = getIntent().getStringExtra("selectedWarehouseId");
         selectedGroupItems = getIntent().getParcelableArrayListExtra("selectedGroupItems");
-        CheckoutAdapter adapter = new CheckoutAdapter(this, selectedGroupItems);
+        adapter = new CheckoutAdapter(this, selectedGroupItems); // Khởi tạo adapter
         selectedItemsListView.setAdapter(adapter);
         warehouseIdTextView.setText("Warehouse ID: " + selectedWarehouseId);
-        totalTextView.setText("Tổng tiền: $" + String.format("%.2f", adapter.getTotalPrice()));
+        totalTextView.setText("Product Total: $" + String.format("%.2f", adapter.getTotalPrice()));
 
         // Tính toán khoảng cách ban đầu dựa trên địa chỉ chính
         viewModel.calculateDistance(userId, Arrays.asList(Long.parseLong(selectedWarehouseId)));
@@ -102,11 +133,21 @@ public class CheckoutPage extends AppCompatActivity {
         });
 
         loadPrimaryAddress(); // Gọi phương thức để tải địa chỉ chính
+        loadCoupons(); // Gọi phương thức để tải các mã giảm giá
+        loadShippingTypes(); // Gọi phương thức để tải các loại vận chuyển
 
         changeAddressButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 showAddressSelectionDialog(); // Mở dialog để chọn địa chỉ mới
+            }
+        });
+
+        applyCouponButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                selectedCouponCode = couponSpinner.getSelectedItem().toString();
+                applyCoupon(); // Áp dụng mã giảm giá
             }
         });
 
@@ -118,11 +159,11 @@ public class CheckoutPage extends AppCompatActivity {
                     try {
                         DistanceData distanceData = new DistanceData();
                         distanceData.setUserId(distanceRecord.getUserId());
-                        distanceData.setOriginName(distanceRecord.getWarehouseName());  // Sử dụng tên kho làm nơi xuất phát
+                        distanceData.setOriginName(distanceRecord.getWarehouseName());
                         distanceData.setOriginLatitude(distanceRecord.getOriginLatitude());
                         distanceData.setOriginLongitude(distanceRecord.getOriginLongitude());
                         distanceData.setWarehouseId(distanceRecord.getWarehouseId());
-                        distanceData.setDestinationName(distanceRecord.getReceiverName());  // Sử dụng tên người nhận làm nơi đến
+                        distanceData.setDestinationName(distanceRecord.getReceiverName());
                         distanceData.setDestinationLatitude(distanceRecord.getDestinationLatitude());
                         distanceData.setDestinationLongitude(distanceRecord.getDestinationLongitude());
                         distanceData.setDistance(distanceRecord.getDistance());
@@ -132,9 +173,9 @@ public class CheckoutPage extends AppCompatActivity {
                                 1L,
                                 userId.intValue(),
                                 selectedGroupItems,
-                                distanceData,  // Sử dụng DistanceData đã chuyển đổi
+                                distanceData,
                                 adapter.getTotalPrice(),
-                                "mobile" // Truyền thêm thông tin về nền tảng
+                                "mobile"
                         );
 
                         PaymentService paymentService = PaymentRetrofitClient.getPaymentService();
@@ -146,9 +187,7 @@ public class CheckoutPage extends AppCompatActivity {
                                     String responseBody = response.body();
                                     Log.d(TAG, "Response Body: " + responseBody);
 
-                                    // Kiểm tra xem phản hồi có phải là URL không
                                     if (responseBody.startsWith("https://")) {
-                                        // Mở URL trong trình duyệt
                                         Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(responseBody));
                                         startActivity(browserIntent);
                                     } else {
@@ -183,6 +222,31 @@ public class CheckoutPage extends AppCompatActivity {
                 }
             }
         });
+
+        // Thiết lập sự kiện khi chọn item trong Spinner
+        couponSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                String selected = parent.getItemAtPosition(position).toString();
+                if (!selected.equals("Select a coupon")) {
+                    applyCouponButton.setEnabled(true);
+                } else {
+                    applyCouponButton.setEnabled(false);
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                applyCouponButton.setEnabled(false);
+            }
+        });
+
+        // Thiết lập sự kiện khi chọn shipping type
+        shippingRadioGroup.setOnCheckedChangeListener((group, checkedId) -> {
+            RadioButton selectedRadioButton = findViewById(checkedId);
+            selectedShipping = (Shipping) selectedRadioButton.getTag();
+            calculateShippingCost(); // Tính toán lại chi phí vận chuyển
+        });
     }
 
     private void loadPrimaryAddress() {
@@ -194,7 +258,6 @@ public class CheckoutPage extends AppCompatActivity {
                 if (response.isSuccessful() && response.body() != null) {
                     Address primaryAddress = response.body();
                     primaryAddressTextView.setText("Primary Address: " + primaryAddress.getFullAddress());
-                    // Tính toán lại khoảng cách với địa chỉ chính ban đầu
                     calculateDistanceWithFullAddress(primaryAddress);
                 } else {
                     primaryAddressTextView.setText("Primary Address: Not found");
@@ -228,7 +291,6 @@ public class CheckoutPage extends AppCompatActivity {
                             .setItems(addressArray, (dialog, which) -> {
                                 Address selectedAddress = addresses.get(which);
                                 primaryAddressTextView.setText("Primary Address: " + selectedAddress.getFullAddress());
-                                // Tính toán lại khoảng cách với địa chỉ được chọn
                                 calculateDistanceWithFullAddress(selectedAddress);
                             })
                             .setNegativeButton("Cancel", null)
@@ -251,7 +313,6 @@ public class CheckoutPage extends AppCompatActivity {
     private void calculateDistanceWithFullAddress(Address address) {
         DistanceService distanceService = DistanceRetrofitClient.getDistanceService();
 
-        // Kiểm tra và log lại các giá trị đang được truyền vào API để đảm bảo tính chính xác
         Log.d(TAG, "Receiver Name: " + address.getReceiverName());
         Log.d(TAG, "Street: " + address.getStreet());
         Log.d(TAG, "Ward: " + address.getWard());
@@ -299,7 +360,120 @@ public class CheckoutPage extends AppCompatActivity {
         });
     }
 
+    private void applyCoupon() {
+        CustomerCouponService service = CustomerCouponRetrofitClient.getCustomerCouponService();
+        ApplyCouponRequest request = new ApplyCouponRequest();
+        request.setCode(selectedCouponCode);
 
+        double orderValue = Double.parseDouble(totalTextView.getText().toString().replace("Product Total: $", ""));
+        request.setOrderValue(orderValue);
+
+        request.setShippingCost(shippingCost);
+
+        Call<DiscountResult> call = service.applyCoupon(request);
+        call.enqueue(new Callback<DiscountResult>() {
+            @Override
+            public void onResponse(Call<DiscountResult> call, Response<DiscountResult> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    DiscountResult discountResult = response.body();
+                    discountedTotalTextView.setText("Discounted Total: $" + discountResult.getDiscountedOrderValue());
+                } else {
+                    Log.e(TAG, "Failed to apply coupon. Response code: " + response.code());
+                    try {
+                        if (response.errorBody() != null) {
+                            Log.e(TAG, "Error Body: " + response.errorBody().string());
+                        }
+                    } catch (IOException e) {
+                        Log.e(TAG, "Error reading error body", e);
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<DiscountResult> call, Throwable t) {
+                Log.e(TAG, "Error applying coupon", t);
+            }
+        });
+    }
+
+    private void loadCoupons() {
+        CustomerCouponService service = CustomerCouponRetrofitClient.getCustomerCouponService();
+        Call<List<CustomerCoupon>> call = service.getAllCustomerCoupons();
+        call.enqueue(new Callback<List<CustomerCoupon>>() {
+            @Override
+            public void onResponse(Call<List<CustomerCoupon>> call, Response<List<CustomerCoupon>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    List<CustomerCoupon> coupons = response.body();
+                    ArrayAdapter<String> adapter = new ArrayAdapter<>(CheckoutPage.this, android.R.layout.simple_spinner_item);
+                    adapter.add("Select a coupon");
+                    for (CustomerCoupon coupon : coupons) {
+                        adapter.add(coupon.getCode());
+                    }
+                    adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                    couponSpinner.setAdapter(adapter);
+                    applyCouponButton.setEnabled(false);
+                } else {
+                    Log.e(TAG, "Failed to load coupons. Response code: " + response.code());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<CustomerCoupon>> call, Throwable t) {
+                Log.e(TAG, "Error loading coupons", t);
+            }
+        });
+    }
+
+    private void loadShippingTypes() {
+        ShippingService service = DistanceRetrofitClient.getShippingService();
+        Call<List<Shipping>> call = service.getAllShippingTypes();
+        call.enqueue(new Callback<List<Shipping>>() {
+            @Override
+            public void onResponse(Call<List<Shipping>> call, Response<List<Shipping>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    List<Shipping> shippingTypes = response.body();
+                    if (!shippingTypes.isEmpty()) {
+                        shippingTypes.sort(Comparator.comparingLong(Shipping::getId));
+                        selectedShipping = shippingTypes.get(0);
+
+                        for (Shipping shipping : shippingTypes) {
+                            RadioButton radioButton = new RadioButton(CheckoutPage.this);
+                            radioButton.setText(shipping.getName());
+                            radioButton.setTag(shipping);
+                            shippingRadioGroup.addView(radioButton);
+
+                            if (shipping.equals(selectedShipping)) {
+                                radioButton.setChecked(true);
+                            }
+                        }
+                        calculateShippingCost();
+                    }
+                } else {
+                    Log.e(TAG, "Failed to load shipping types. Response code: " + response.code());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<Shipping>> call, Throwable t) {
+                Log.e(TAG, "Error loading shipping types", t);
+            }
+        });
+    }
+
+    private void calculateShippingCost() {
+        DistanceRecord distanceRecord = viewModel.getDistanceRecord().getValue();
+        double distance = distanceRecord != null ? distanceRecord.getDistance() : 0.0;
+        double totalWeight = adapter.getTotalWeight(); // Sử dụng biến adapter đã được khai báo
+
+        if (selectedShipping != null) {
+            shippingCost = (selectedShipping.getPricePerKm() * distance) + (selectedShipping.getPricePerKg() * totalWeight);
+            shippingCostTextView.setText("Shipping Total: $" + String.format("%.2f", shippingCost));
+
+            double productTotal = Double.parseDouble(totalTextView.getText().toString().replace("Product Total: $", ""));
+            double totalCost = productTotal + shippingCost;
+            totalCostTextView.setText("Total Cost: $" + String.format("%.2f", totalCost));
+        }
+    }
 
     private void updateUIWithDistanceRecord(DistanceRecord distanceRecord) {
         TextView tvReceiverName = findViewById(R.id.tvReceiverName);
@@ -319,5 +493,7 @@ public class CheckoutPage extends AppCompatActivity {
                 distanceRecord.getWarehouseWard();
         warehouseAddress.setText("Address: " + warehouseFullAddress);
         route.setText("Route: " + distanceRecord.getRoute());
+
+        calculateShippingCost(); // Tính toán chi phí vận chuyển sau khi cập nhật khoảng cách
     }
 }

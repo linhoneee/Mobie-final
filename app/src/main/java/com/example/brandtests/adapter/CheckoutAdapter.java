@@ -20,21 +20,28 @@ import java.util.List;
 
 public class CheckoutAdapter extends ArrayAdapter<Item> {
     private BigDecimal totalPrice = BigDecimal.ZERO;  // Sử dụng BigDecimal để đảm bảo tính chính xác
+    private double totalWeight = 0.0;  // Biến để lưu trữ tổng khối lượng
 
     public CheckoutAdapter(@NonNull Context context, @NonNull List<Item> items) {
         super(context, 0, items);
-        calculateTotalPrice(items);
+        calculateTotalPriceAndWeight(items);  // Tính tổng giá và khối lượng
     }
 
-    private void calculateTotalPrice(List<Item> items) {
+    private void calculateTotalPriceAndWeight(List<Item> items) {
         totalPrice = BigDecimal.ZERO;
+        totalWeight = 0.0;
         for (Item item : items) {
             totalPrice = totalPrice.add(item.getPrice().multiply(new BigDecimal(item.getQuantity())));
+            totalWeight += item.getWeight() * item.getQuantity();  // Cộng thêm trọng lượng của từng mục
         }
     }
 
     public double getTotalPrice() {
         return totalPrice.doubleValue();  // Trả về giá trị double từ BigDecimal
+    }
+
+    public double getTotalWeight() {
+        return totalWeight;  // Trả về tổng khối lượng
     }
 
     @NonNull
