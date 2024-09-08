@@ -1,8 +1,5 @@
 package com.example.brandtests.model;
 
-
-import java.time.LocalDateTime;
-
 public class ChatMessage {
     private Long id;
     private String text;
@@ -11,7 +8,10 @@ public class ChatMessage {
     private String role;
     private Long roomId;
     private Boolean unRead;
-
+    private String createdAt;
+    private String updatedAt;
+    private String createdAtAsLocalDateTime;
+    private String createdAtAsString;
 
     // Constructor không tham số
     public ChatMessage() {}
@@ -81,5 +81,35 @@ public class ChatMessage {
         this.unRead = unRead;
     }
 
+    public String getCreatedAt() {
+        return createdAt;
+    }
 
+    public void setCreatedAt(String createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public String getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(String updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    public String getCreatedAtAsLocalDateTime() {
+        return createdAtAsLocalDateTime;
+    }
+
+    public void setCreatedAtAsLocalDateTime(String createdAtAsLocalDateTime) {
+        this.createdAtAsLocalDateTime = createdAtAsLocalDateTime;
+    }
+
+    public String getCreatedAtAsString() {
+        return createdAtAsString;
+    }
+
+    public void setCreatedAtAsString(String createdAtAsString) {
+        this.createdAtAsString = createdAtAsString;
+    }
 }

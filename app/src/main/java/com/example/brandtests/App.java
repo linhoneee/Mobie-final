@@ -38,6 +38,8 @@ public class App extends Application {
             // Sử dụng Handler để đảm bảo Toast chạy trên UI thread
             new Handler(Looper.getMainLooper()).post(() -> {
                 Toast.makeText(getApplicationContext(), "New message: " + message, Toast.LENGTH_SHORT).show();
+                NotificationHelper.showNotification(getApplicationContext(), "New Message", "You have received a new message!");
+
             });
         }
     }

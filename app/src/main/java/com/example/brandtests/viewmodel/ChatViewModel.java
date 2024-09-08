@@ -16,7 +16,6 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import java.util.ArrayList;
 import java.util.List;
-
 public class ChatViewModel extends AndroidViewModel {
     private static final String TAG = "ChatViewModel";
     private WebSocketService webSocketService;
@@ -36,6 +35,40 @@ public class ChatViewModel extends AndroidViewModel {
         webSocketService.connectWebSocket(userId);
 
         chatService = ChatRetrofitClient.getClient().create(ChatService.class);
+
+        // Gọi API để lấy danh sách tin nhắn theo roomId (ở đây là userId)
+        loadMessagesByRoomId(userId);
+    }
+
+    private void loadMessagesByRoomId(long roomId) {
+        chatService.getMessagesByRoomId(roomId).enqueue(new Callback<List<ChatMessage>>() {
+            @Override
+            public void onResponse(Call<List<ChatMessage>> call, Response<List<ChatMessage>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    Log.d(TAG, "Messages loaded successfully");
+                    messages.postValue(response.body()); // Cập nhật LiveData để hiển thị tin nhắn
+                } else {
+                    try {
+                        // Chuyển đổi errorBody thành chuỗi để xem chi tiết lỗi
+                        if (response.errorBody() != null) {
+                            // Chuyển đổi nội dung errorBody thành chuỗi
+                            String errorBody = response.errorBody().string();
+                            Log.e(TAG, "Failed to load messages: " + errorBody);
+                        } else {
+                            Log.e(TAG, "Failed to load messages: Unknown error, errorBody is null");
+                        }
+                    } catch (Exception e) {
+                        Log.e(TAG, "Error reading error body", e);
+                    }
+                }
+            }
+
+
+            @Override
+            public void onFailure(Call<List<ChatMessage>> call, Throwable t) {
+                Log.e(TAG, "Error loading messages", t);
+            }
+        });
     }
 
     private void onNewMessageReceived(String jsonMessage) {
@@ -71,7 +104,7 @@ public class ChatViewModel extends AndroidViewModel {
         String username = sharedPreferences.getString("email", "Unknown");
         ChatMessage message = new ChatMessage(messageText, userId, userId, username);
 
-//        // Gửi tin nhắn qua WebSocket
+        // Gửi tin nhắn qua WebSocket
         webSocketService.sendMessage(message);
 
         // Gửi API để lưu tin nhắn

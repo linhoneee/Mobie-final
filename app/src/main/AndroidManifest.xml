@@ -4,6 +4,8 @@
 
     <!-- Thêm quyền truy cập internet -->
     <uses-permission android:name="android.permission.INTERNET"/>
+<!--    thêm quyền để tạo thông báo notification thay vì toast-->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
 
     <application
         android:allowBackup="true"
