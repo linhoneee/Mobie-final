@@ -62,17 +62,35 @@ public class CartActivity extends AppCompatActivity {
                 new CartWithInventoryViewModelFactory(CartRetrofitClient.getCartService(), InventoryRetrofitClient.getInventoryService()))
                 .get(CartViewModel.class);
 
-        checkoutViewModel = new ViewModelProvider(this).get(CheckoutViewModel.class);
+//        checkoutViewModel = new ViewModelProvider(this).get(CheckoutViewModel.class);
 
         cartViewModel.fetchCart(userId);
         cartViewModel.fetchInventories();
+
+        // Quan sát kết quả từ ViewModel để hiển thị Toast khi thao tác thành công hoặc thất bại
+        cartViewModel.getAddItemResult().observe(this, result -> {
+            Toast.makeText(CartActivity.this, result, Toast.LENGTH_SHORT).show();
+        });
 
         cartViewModel.getCart().observe(this, cart -> {
             if (cart != null) {
                 cartViewModel.getInventories().observe(this, inventories -> {
                     if (inventories != null) {
                         List<Item> items = cart.getItemsList();
-                        adapter = new CartAdapter(this, items, userId, inventories);
+
+                        // Truyền các listener vào adapter
+                        adapter = new CartAdapter(this, items, userId, inventories,
+                                (item, newQuantity) -> {
+                                    cartViewModel.updateItemQuantity(userId, item, newQuantity); // Gọi ViewModel xử lý logic
+                                },
+                                (item, isChecked) -> {
+                                    if (isChecked) {
+                                        adapter.getSelectedItems().add(item);
+                                    } else {
+                                        adapter.getSelectedItems().remove(item);
+                                    }
+                                }
+                        );
                         cartListView.setAdapter(adapter);
                     }
                 });
@@ -91,11 +109,12 @@ public class CartActivity extends AppCompatActivity {
         });
     }
 
+    // Hàm xử lý hiển thị dialog thanh toán
     private void showCheckoutDialog(List<Item> selectedItems) {
         Map<Long, String> itemWarehouseIdsMap = adapter.getItemWarehouseIdsMap();
-        checkoutViewModel.groupItemsByWarehouse(selectedItems, itemWarehouseIdsMap);
+        cartViewModel.groupItemsByWarehouse(selectedItems, itemWarehouseIdsMap);
 
-        checkoutViewModel.getWarehouseGroups().observe(this, warehouseGroups -> {
+        cartViewModel.getWarehouseGroups().observe(this, warehouseGroups -> {
             if (warehouseGroups == null) return;
 
             LayoutInflater inflater = LayoutInflater.from(this);

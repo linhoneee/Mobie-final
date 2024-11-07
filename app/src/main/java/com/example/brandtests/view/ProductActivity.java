@@ -14,6 +14,7 @@ import com.example.brandtests.adapter.ProductAdapter;
 import com.example.brandtests.model.Item;
 import com.example.brandtests.model.ProductDTOuser;
 import com.example.brandtests.service.CartRetrofitClient;
+import com.example.brandtests.service.InventoryRetrofitClient;
 import com.example.brandtests.service.RetrofitClient;
 import com.example.brandtests.viewmodel.CartViewModel;
 import com.example.brandtests.viewmodel.CartViewModelFactory;
@@ -48,8 +49,11 @@ public class ProductActivity extends AppCompatActivity {
         productViewModel = new ViewModelProvider(this, new ProductViewModelFactory(RetrofitClient.getProductService()))
                 .get(ProductViewModel.class);
 
-        cartViewModel = new ViewModelProvider(this, new CartViewModelFactory(CartRetrofitClient.getCartService()))
-                .get(CartViewModel.class);
+        cartViewModel = new ViewModelProvider(
+                this,
+                new CartViewModelFactory(CartRetrofitClient.getCartService(), InventoryRetrofitClient.getInventoryService())
+        ).get(CartViewModel.class);
+
 
         productViewModel.getProducts().observe(this, products -> {
             if (products != null) {

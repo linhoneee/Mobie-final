@@ -4,7 +4,6 @@ import android.content.Context;
 import android.graphics.Color;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,18 +13,13 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.lifecycle.LifecycleOwner;
-import androidx.lifecycle.ViewModelProvider;
-import androidx.lifecycle.ViewModelStoreOwner;
 
 import com.example.brandtests.R;
 import com.example.brandtests.model.Inventory;
 import com.example.brandtests.model.Item;
-import com.example.brandtests.viewmodel.CartViewModel;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -35,16 +29,30 @@ import java.util.stream.Collectors;
 
 public class CartAdapter extends ArrayAdapter<Item> {
 
-    private static final String TAG = "CartAdapter";
     private Long userId;
-    private Map<Long, String> itemWarehouseIdsMap;
     private List<Item> selectedItems = new ArrayList<>();
-    private CartViewModel cartViewModel;
+    private Map<Long, String> itemWarehouseIdsMap;
 
-    // Constructor không cần CartViewModel
-    public CartAdapter(@NonNull Context context, @NonNull List<Item> items, Long userId, List<Inventory> inventories) {
+    // Định nghĩa các callback
+    public interface OnQuantityChangeListener {
+        void onQuantityChanged(Item item, int newQuantity);
+    }
+
+    public interface OnItemCheckListener {
+        void onItemChecked(Item item, boolean isChecked);
+    }
+
+    private OnQuantityChangeListener quantityChangeListener;
+    private OnItemCheckListener itemCheckListener;
+
+    // Constructor
+    public CartAdapter(@NonNull Context context, @NonNull List<Item> items, Long userId,
+                       List<Inventory> inventories, OnQuantityChangeListener quantityChangeListener,
+                       OnItemCheckListener itemCheckListener) {
         super(context, 0, items);
         this.userId = userId;
+        this.quantityChangeListener = quantityChangeListener;
+        this.itemCheckListener = itemCheckListener;
 
         itemWarehouseIdsMap = inventories.stream()
                 .collect(Collectors.groupingBy(
@@ -54,14 +62,6 @@ public class CartAdapter extends ArrayAdapter<Item> {
                                 Collectors.joining(",")
                         )
                 ));
-        cartViewModel = new ViewModelProvider((ViewModelStoreOwner) context).get(CartViewModel.class);
-
-        // Lắng nghe kết quả thêm vào giỏ hàng và hiển thị thông báo
-        cartViewModel.getAddItemResult().observe((LifecycleOwner) context, result -> {
-            if (result != null && !result.isEmpty()) {
-                Toast.makeText(context, result, Toast.LENGTH_SHORT).show();
-            }
-        });
     }
 
     @NonNull
@@ -98,7 +98,7 @@ public class CartAdapter extends ArrayAdapter<Item> {
                 Picasso.get().load(defaultImageUrl).into(productImage);
             }
 
-            // Đổi màu nếu hết hàng
+            // Kiểm tra có hàng hay không để hiển thị màu nền
             if (warehouseIds == null || warehouseIds.isEmpty()) {
                 convertView.setBackgroundColor(Color.RED);
                 increaseQuantityButton.setEnabled(false);
@@ -112,10 +112,48 @@ public class CartAdapter extends ArrayAdapter<Item> {
                 productCheckbox.setEnabled(true);
                 productQuantity.setEnabled(true);
             }
-            // Lưu lại số lượng ban đầu
-            final int[] originalQuantity = {item.getQuantity()};
 
-            // Sử dụng TextWatcher để theo dõi thay đổi số lượng
+            // Sự kiện khi tăng số lượng
+            increaseQuantityButton.setOnClickListener(v -> {
+                int newQuantity = item.getQuantity() + 1;
+                productQuantity.setText(String.valueOf(newQuantity)); // Cập nhật số lượng hiển thị
+                if (quantityChangeListener != null) {
+                    quantityChangeListener.onQuantityChanged(item, newQuantity);
+                }
+            });
+
+            // Sự kiện khi giảm số lượng
+            reduceQuantityButton.setOnClickListener(v -> {
+                int newQuantity = item.getQuantity() - 1;
+                if (newQuantity > 0) {
+                    productQuantity.setText(String.valueOf(newQuantity)); // Cập nhật số lượng hiển thị
+                    if (quantityChangeListener != null) {
+                        quantityChangeListener.onQuantityChanged(item, newQuantity);
+                    }
+                }
+            });
+
+            // Sự kiện khi chọn sản phẩm
+            productCheckbox.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                if (itemCheckListener != null) {
+                    itemCheckListener.onItemChecked(item, isChecked);
+                }
+            });
+
+            // Sự kiện khi EditText mất tiêu điểm
+            productQuantity.setOnFocusChangeListener((v, hasFocus) -> {
+                if (!hasFocus) {
+                    String input = productQuantity.getText().toString();
+                    if (!input.isEmpty()) {
+                        int newQuantity = Integer.parseInt(input);
+                        if (quantityChangeListener != null) {
+                            quantityChangeListener.onQuantityChanged(item, newQuantity);
+                        }
+                    }
+                }
+            });
+
+            // TextWatcher để theo dõi thay đổi trong EditText
             productQuantity.addTextChangedListener(new TextWatcher() {
                 @Override
                 public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -127,98 +165,10 @@ public class CartAdapter extends ArrayAdapter<Item> {
 
                 @Override
                 public void afterTextChanged(Editable s) {
-                    // Chỉ xử lý khi EditText này mất tiêu điểm
+                    // Logic xử lý khi văn bản thay đổi nếu cần thiết
                 }
             });
-
-            // Sự kiện khi EditText mất tiêu điểm
-            productQuantity.setOnFocusChangeListener((v, hasFocus) -> {
-                if (!hasFocus) {
-                    String input = productQuantity.getText().toString();
-                    if (!input.isEmpty()) {
-                        int newQuantity = Integer.parseInt(input);
-                        int difference = newQuantity - originalQuantity[0];
-
-                        if (difference > 0) {
-                            // Số lượng tăng, gọi addItemToCart với số lượng chênh lệch
-                            Item newItem = new Item(
-                                    item.getProductId(),
-                                    item.getName(),
-                                    item.getPrice(),
-                                    difference, // Số lượng thêm vào là sự khác biệt
-                                    item.getWeight(),
-                                    item.getPrimaryImageUrl()
-                            );
-                            cartViewModel.addItemToCart(userId, newItem);
-                        } else if (difference < 0) {
-                            // Số lượng giảm, gọi removeItemFromCart với số lượng chênh lệch
-                            Item newItem = new Item(
-                                    item.getProductId(),
-                                    item.getName(),
-                                    item.getPrice(),
-                                    Math.abs(difference), // Số lượng xóa là giá trị tuyệt đối của sự khác biệt
-                                    item.getWeight(),
-                                    item.getPrimaryImageUrl()
-                            );
-                            cartViewModel.removeItemFromCart(userId, newItem);
-                        }
-
-                        // Cập nhật số lượng ban đầu
-                        originalQuantity[0] = newQuantity;
-                    }}});
-            // Sự kiện click vào checkbox
-            productCheckbox.setOnCheckedChangeListener((buttonView, isChecked) -> {
-                if (isChecked) {
-                    selectedItems.add(item);
-                } else {
-                    selectedItems.remove(item);
-                }
-            });
-
-            // Sự kiện click vào nút "+" để tăng số lượng của sản phẩm
-            increaseQuantityButton.setOnClickListener(v -> {
-                int newQuantity = item.getQuantity() + 1;
-                item.setQuantity(newQuantity); // Cập nhật số lượng sản phẩm
-                // Gọi API để thêm sản phẩm vào giỏ hàng
-                Item newItem = new Item(
-                        item.getProductId(),
-                        item.getName(),
-                        item.getPrice(),
-                        1, // Thêm một sản phẩm
-                        item.getWeight(),
-                        item.getPrimaryImageUrl()
-                );
-                cartViewModel.addItemToCart(userId, newItem);
-                // Cập nhật lại giao diện
-                productQuantity.setText(String.valueOf(newQuantity));
-            });
-
-            // Sự kiện click vào nút "-" để giảm số lượng của sản phẩm
-            reduceQuantityButton.setOnClickListener(v -> {
-                int newQuantity = item.getQuantity() - 1;
-                if (newQuantity > 0) {
-                    item.setQuantity(newQuantity); // Cập nhật số lượng sản phẩm
-
-                    // Gọi API để xóa sản phẩm khỏi giỏ hàng
-                    Item newItem = new Item(
-                            item.getProductId(),
-                            item.getName(),
-                            item.getPrice(),
-                            1, // Giảm một sản phẩm
-                            item.getWeight(),
-                            item.getPrimaryImageUrl()
-                    );
-                    cartViewModel.removeItemFromCart(userId, newItem);
-                    // Cập nhật lại giao diện
-                    productQuantity.setText(String.valueOf(newQuantity));
-                } else {
-                    Toast.makeText(getContext(), "Số lượng không thể nhỏ hơn 1", Toast.LENGTH_SHORT).show();
-                }
-            });
-        } else {
-            Log.e(TAG, "getView: Item is null at position " + position);
         }
-
         return convertView;
     }
 

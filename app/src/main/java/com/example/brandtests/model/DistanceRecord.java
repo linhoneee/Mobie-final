@@ -1,5 +1,6 @@
 package com.example.brandtests.model;
 
+
 public class DistanceRecord {
     private Long userId;
     private String receiverName;
@@ -154,5 +155,14 @@ public class DistanceRecord {
 
     public void setRoute(String route) {
         this.route = route;
+    }
+
+    // New methods for full addresses
+    public String getFullReceiverAddress() {
+        return street + ", " + ward + ", " + district + ", " + provinceCity;
+    }
+
+    public String getWarehouseFullAddress() {
+        return warehouseWard + ", " + warehouseDistrict + ", " + warehouseProvinceCity;
     }
 }

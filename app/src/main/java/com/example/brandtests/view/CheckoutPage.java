@@ -8,15 +8,14 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
-import android.widget.TextView;
-import android.widget.Toast;
-import android.widget.ArrayAdapter;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Spinner;
-
+import android.widget.TextView;
+import android.widget.Toast;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
@@ -38,8 +37,8 @@ import com.example.brandtests.service.CustomerCouponRetrofitClient;
 import com.example.brandtests.service.CustomerCouponService;
 import com.example.brandtests.service.DistanceRetrofitClient;
 import com.example.brandtests.service.DistanceService;
-import com.example.brandtests.service.PaymentService;
 import com.example.brandtests.service.PaymentRetrofitClient;
+import com.example.brandtests.service.PaymentService;
 import com.example.brandtests.service.ShippingService;
 import com.example.brandtests.viewmodel.CheckoutViewModel;
 
@@ -53,6 +52,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class CheckoutPage extends AppCompatActivity {
+
     private CheckoutViewModel viewModel;
     private SharedPreferences sharedPreferences;
     private Long userId;
@@ -423,8 +423,6 @@ public class CheckoutPage extends AppCompatActivity {
             }
         });
     }
-
-
 
     private void loadCoupons() {
         CustomerCouponService service = CustomerCouponRetrofitClient.getCustomerCouponService();

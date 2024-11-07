@@ -19,6 +19,7 @@ import com.example.brandtests.R;
 import com.example.brandtests.model.Item;
 import com.example.brandtests.model.ProductDTOuser;
 import com.example.brandtests.service.CartRetrofitClient;
+import com.example.brandtests.service.InventoryRetrofitClient;
 import com.example.brandtests.viewmodel.CartViewModel;
 import com.example.brandtests.viewmodel.CartViewModelFactory;
 import com.squareup.picasso.Picasso;
@@ -42,8 +43,10 @@ public class ProductAdapter extends ArrayAdapter<ProductDTOuser> {
         this.userId = userId;
         this.listener = listener;
 
-        cartViewModel = new ViewModelProvider((ViewModelStoreOwner) context, new CartViewModelFactory(CartRetrofitClient.getCartService()))
-                .get(CartViewModel.class);
+        cartViewModel = new ViewModelProvider(
+                (ViewModelStoreOwner) context,
+                new CartViewModelFactory(CartRetrofitClient.getCartService(), InventoryRetrofitClient.getInventoryService())
+        ).get(CartViewModel.class);
     }
 
     @NonNull

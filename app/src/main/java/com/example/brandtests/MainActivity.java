@@ -54,9 +54,9 @@ public class MainActivity extends AppCompatActivity {
         // Khởi tạo SharedPreferences
         sharedPreferences = getSharedPreferences("LoginPrefs", Context.MODE_PRIVATE);
 
-        // Khởi tạo CartViewModel
-        cartViewModel = new ViewModelProvider(this, new CartViewModelFactory(CartRetrofitClient.getCartService()))
-                .get(CartViewModel.class);
+//        // Khởi tạo CartViewModel
+//        cartViewModel = new ViewModelProvider(this, new CartViewModelFactory(CartRetrofitClient.getCartService()))
+//                .get(CartViewModel.class);
 
         // Kiểm tra nếu người dùng đã đăng nhập
         checkIfLoggedIn();
