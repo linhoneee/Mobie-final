@@ -1,14 +1,255 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--activity_product.xml-->
-
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="16dp">
+    android:background="#E0F7EF">
 
-    <ListView
-        android:id="@+id/listViewProducts"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
-</LinearLayout>
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <!-- Logo, Title, and Cart/Chat/Profile Section -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingBottom="16dp"
+            android:paddingTop="8dp">
+
+            <!-- Logo and Title -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_weight="1">
+
+                <ImageView
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:src="@drawable/ic_greenhome_logo"
+                    android:contentDescription="GreenHome Logo" />
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:paddingStart="8dp">
+
+                    <TextView
+                        android:id="@+id/pageTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="GreenHome"
+                        android:textSize="22sp"
+                        android:textColor="#1B5E20"
+                        android:fontFamily="sans-serif-medium"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/pageSubtitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Đồng hành cùng bạn vì tương lai xanh"
+                        android:textSize="14sp"
+                        android:textColor="#4CAF50"
+                        android:fontFamily="sans-serif" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- Cart, Chat, and Profile Icons with Labels -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center">
+
+                <!-- Cart Icon and Label -->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:gravity="center_horizontal"
+                    android:paddingEnd="8dp">
+
+                    <ImageButton
+                        android:id="@+id/bbuttonCart"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:background="?android:selectableItemBackgroundBorderless"
+                        android:contentDescription="Giỏ hàng"
+                        android:scaleType="centerInside"
+                        android:src="@drawable/ic_shopping_cart"
+                        />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_horizontal"
+                        android:text="Giỏ hàng"
+                        android:textColor="#4CAF50"
+                        android:textSize="12sp" />
+                </LinearLayout>
+
+                <!-- Chat Icon and Label -->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:gravity="center_horizontal"
+                    android:paddingEnd="8dp">
+
+                    <ImageButton
+                        android:id="@+id/bbuttonChat"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:background="?android:selectableItemBackgroundBorderless"
+                        android:contentDescription="Chat"
+                        android:scaleType="centerInside"
+                        android:src="@drawable/ic_chat"
+                        />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_horizontal"
+                        android:text="Chat"
+                        android:textColor="#4CAF50"
+                        android:textSize="12sp" />
+                </LinearLayout>
+
+                <!-- Profile Icon and Label -->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:gravity="center_horizontal">
+
+                    <ImageButton
+                        android:id="@+id/bbuttonProfile"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:background="?android:selectableItemBackgroundBorderless"
+                        android:contentDescription="Profile"
+                        android:scaleType="centerInside"
+                        android:src="@drawable/boy"
+                        />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_horizontal"
+                        android:text="Profile"
+                        android:textColor="#4CAF50"
+                        android:textSize="12sp" />
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Promotional Banner with ViewPager2 -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="6dp"
+            android:layout_marginBottom="16dp">
+
+            <androidx.viewpager2.widget.ViewPager2
+                android:id="@+id/bannerViewPager"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+        </androidx.cardview.widget.CardView>
+
+        <!-- Banner Dots Indicator -->
+        <LinearLayout
+            android:id="@+id/bannerDotsIndicator"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="-20dp"
+            android:layout_marginBottom="20dp" />
+
+        <!-- Featured Products Section -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Sản phẩm thân thiện với môi trường"
+            android:textSize="18sp"
+            android:textColor="#388E3C"
+            android:fontFamily="sans-serif-medium"
+            android:padding="8dp"
+            android:background="#A5D6A7"
+            android:gravity="center_horizontal"
+            android:layout_marginBottom="12dp" />
+
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="6dp"
+            android:background="#FFFFFF">
+
+            <ListView
+                android:id="@+id/listViewProducts"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:divider="@android:color/darker_gray"
+                android:dividerHeight="1dp" />
+        </androidx.cardview.widget.CardView>
+
+        <!-- Login and Logout Action Buttons -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:layout_marginTop="24dp"
+            android:layout_marginBottom="16dp"
+            android:weightSum="2">
+
+            <Button
+                android:id="@+id/bbuttonLogin"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Đăng Nhập"
+                android:textColor="#FFFFFF"
+                android:backgroundTint="#1B5E20"
+                android:layout_marginEnd="8dp"
+                android:padding="12dp"
+                android:fontFamily="sans-serif-medium"
+                android:textAllCaps="false" />
+
+            <Button
+                android:id="@+id/bbuttonLogout"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Đăng Xuất"
+                android:textColor="#FFFFFF"
+                android:backgroundTint="#C62828"
+                android:visibility="gone"
+                android:layout_marginStart="8dp"
+                android:padding="12dp"
+                android:fontFamily="sans-serif-medium"
+                android:textAllCaps="false" />
+        </LinearLayout>
+
+        <!-- Footer with Environmental Message -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="GreenHome - Hãy cùng sống xanh vì hành tinh của chúng ta!"
+            android:textSize="14sp"
+            android:textColor="#1B5E20"
+            android:fontFamily="sans-serif"
+            android:gravity="center"
+            android:layout_gravity="center"
+            android:layout_marginTop="24dp"
+            android:paddingBottom="16dp" />
+    </LinearLayout>
+</ScrollView>

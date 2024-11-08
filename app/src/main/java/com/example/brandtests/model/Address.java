@@ -17,7 +17,18 @@ public class Address {
     public String getFullAddress() {
         return provinceCity + ", " + district + ", " + ward + ", " + street;
     }
-
+    public Address(Long id, Long userId, String receiverName, String provinceCity, String district, String ward, String street, boolean isPrimary, double latitude, double longitude) {
+        this.id = id;
+        this.userId = userId;
+        this.receiverName = receiverName;
+        this.provinceCity = provinceCity;
+        this.district = district;
+        this.ward = ward;
+        this.street = street;
+        this.isPrimary = isPrimary;
+        this.latitude = latitude;
+        this.longitude = longitude;
+    }
     public Long getId() {
         return id;
     }

@@ -3,18 +3,27 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:padding="8dp">
+    android:padding="12dp"
+    android:background="#E0F2F1"> <!-- Softer green background for a clean look -->
 
     <TextView
         android:id="@+id/textViewUsername"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Username"
-        android:textStyle="bold" />
+        android:textStyle="bold"
+        android:textSize="16sp"
+        android:textColor="#1B5E20" /> <!-- Darker green for username for clarity -->
 
     <TextView
         android:id="@+id/textViewMessage"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Message" />
+        android:text="Message"
+        android:textSize="14sp"
+        android:textColor="#388E3C"
+        android:background="#A5D6A7"
+        android:padding="10dp"
+        android:layout_marginVertical="4dp"
+        android:layout_marginHorizontal="8dp" />
 </LinearLayout>

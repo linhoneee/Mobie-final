@@ -47,7 +47,7 @@
             android:exported="true" />
         <activity android:name=".view.ChatActivity" />
         <activity android:name=".view.CheckoutPage"></activity>
-
+        <activity android:name=".view.ProfileActivity"></activity>
         <!-- Khai báo PaymentSuccessActivity với intent-filter để xử lý deep link -->
         <activity
             android:name=".view.PaymentSuccessActivity"

@@ -1,31 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="#E8F5E9">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="16dp">
+        android:padding="16dp"
+        android:background="#E8F5E9">
 
         <!-- Tiêu đề trang thanh toán -->
         <TextView
             android:id="@+id/checkoutTitle"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Checkout"
-            android:textSize="24sp"
+            android:text="Thanh Toán"
+            android:textSize="26sp"
             android:textStyle="bold"
+            android:gravity="center"
+            android:textColor="#2E7D32"
             android:paddingBottom="16dp"/>
 
-        <!-- Nhãn "Item" -->
+        <!-- Nhãn "Mặt hàng đã chọn" -->
         <TextView
             android:id="@+id/itemLabel"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Item"
+            android:text="Mặt Hàng Đã Chọn"
             android:textSize="18sp"
             android:textStyle="bold"
+            android:textColor="#388E3C"
             android:paddingBottom="8dp"/>
 
         <!-- Danh sách các mặt hàng được chọn -->
@@ -33,191 +39,215 @@
             android:id="@+id/selectedItemsListView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:divider="@android:color/darker_gray"
-            android:dividerHeight="1dp"/>
+            android:divider="@android:color/transparent"
+            android:dividerHeight="12dp"
+            android:background="#FFFFFF"
+            android:elevation="4dp"
+            android:clipToPadding="false"/>
 
-        <!-- Hiển thị Warehouse ID -->
+        <!-- Thông tin kho hàng và khoảng cách -->
         <TextView
             android:id="@+id/selectedWarehouseId"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Warehouse ID:"
-            android:textSize="18sp"
-            android:textStyle="bold"
+            android:textSize="16sp"
+            android:textColor="#333333"
             android:paddingTop="16dp"/>
 
-        <!-- Hiển thị khoảng cách từ kho đến địa chỉ giao hàng -->
         <TextView
             android:id="@+id/distanceTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Distance: "
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:paddingTop="16dp"/>
+            android:text="Khoảng cách từ kho: "
+            android:textSize="16sp"
+            android:textColor="#333333"
+            android:paddingTop="4dp"/>
 
-        <!-- Hiển thị địa chỉ chính -->
         <TextView
             android:id="@+id/primaryAddressTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Primary Address: "
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:paddingTop="16dp"/>
+            android:text="Địa chỉ chính: "
+            android:textSize="16sp"
+            android:textColor="#333333"
+            android:paddingTop="4dp"/>
 
         <!-- Nút để thay đổi địa chỉ chính -->
         <Button
             android:id="@+id/changeAddressButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Change Address"
+            android:text="Thay đổi địa chỉ"
+            android:textColor="#FFFFFF"
+            android:backgroundTint="#388E3C"
             android:layout_marginTop="8dp"/>
 
-
+        <!-- Thông tin người nhận và địa chỉ đầy đủ -->
         <TextView
             android:id="@+id/tvReceiverName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:text="Người nhận:"
             android:textSize="16sp"
-            android:paddingTop="4dp"/>
+            android:textColor="#333333"
+            android:paddingTop="8dp"/>
 
         <TextView
             android:id="@+id/tvFullAddress"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:text="Địa chỉ đầy đủ:"
             android:textSize="16sp"
+            android:textColor="#333333"
             android:paddingTop="4dp"/>
 
-        <!-- TextView này cần phải có để tránh lỗi -->
+        <!-- Thông tin về kho hàng và tuyến đường -->
         <TextView
             android:id="@+id/tvWarehouseName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:text="Tên kho hàng:"
             android:textSize="16sp"
-            android:paddingTop="4dp"/>
+            android:textColor="#333333"
+            android:paddingTop="8dp"/>
 
         <TextView
             android:id="@+id/warehouseAddress"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:text="Địa chỉ kho:"
             android:textSize="16sp"
+            android:textColor="#333333"
             android:paddingTop="4dp"/>
 
         <TextView
             android:id="@+id/route"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:text="Tuyến đường: "
             android:textSize="16sp"
+            android:textColor="#333333"
             android:paddingTop="4dp"/>
 
-        <!-- Spinner để hiển thị danh sách mã giảm giá -->
+        <!-- Mã giảm giá -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Mã giảm giá"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="#388E3C"
+            android:paddingTop="16dp"/>
+
         <Spinner
             android:id="@+id/couponSpinner"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"/>
+            android:layout_marginTop="8dp"
+            android:backgroundTint="#81C784"/>
 
-        <!-- Button để áp dụng mã giảm giá -->
         <Button
             android:id="@+id/applyCouponButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Apply Coupon"
+            android:text="Áp dụng mã giảm giá"
+            android:textColor="#FFFFFF"
+            android:backgroundTint="#388E3C"
             android:layout_marginTop="8dp"
-            android:enabled="false"/> <!-- Nút sẽ chỉ được kích hoạt sau khi chọn mã giảm giá -->
+            android:enabled="false"/>
 
+        <!-- Loại vận chuyển và công thức tính phí -->
+        <TextView
+            android:id="@+id/shippingFormulaTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Công thức tính phí vận chuyển: (Giá/Km * Khoảng cách) + (Giá/Kg * Tổng trọng lượng)"
+            android:textSize="14sp"
+            android:textColor="#555555"
+            android:paddingTop="16dp"/>
 
-
-        <!-- RadioGroup để chọn loại vận chuyển -->
         <RadioGroup
             android:id="@+id/shippingRadioGroup"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingTop="16dp">
-            <!-- Các RadioButton sẽ được thêm động trong mã Java -->
-        </RadioGroup>
-
-        <!-- Hiển thị công thức tính và chi phí vận chuyển -->
-        <TextView
-            android:id="@+id/shippingFormulaTextView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Formula: Shipping Cost = (Price per Km * Distance) + (Price per Kg * Total Weight)"
-            android:textSize="16sp"
             android:paddingTop="8dp"/>
 
-
-        <!-- Hiển thị thông tin người nhận và địa chỉ -->
-        <!-- Hiển thị tổng tiền sản phẩm -->
+        <!-- Tổng chi phí -->
         <TextView
             android:id="@+id/totalTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Product Total: "
+            android:text="Tổng sản phẩm: "
             android:textSize="18sp"
             android:textStyle="bold"
+            android:textColor="#388E3C"
             android:paddingTop="16dp"/>
+
         <TextView
             android:id="@+id/shippingCostTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Shipping Total: "
+            android:text="Tổng phí vận chuyển: "
             android:textSize="18sp"
             android:textStyle="bold"
+            android:textColor="#388E3C"
             android:paddingTop="8dp"/>
 
-        <!-- TextView để hiển thị tổng tiền sau khi áp dụng mã giảm giá -->
         <TextView
             android:id="@+id/discountedTotalTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:text="Tổng sau giảm giá: "
             android:textSize="18sp"
             android:textStyle="bold"
-            android:paddingTop="16dp"/>
+            android:textColor="#388E3C"
+            android:paddingTop="8dp"/>
 
         <TextView
             android:id="@+id/discountType"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:paddingTop="16dp"/>
+            android:textSize="16sp"
+            android:paddingTop="8dp"/>
+
         <TextView
             android:id="@+id/discountAmount"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:paddingTop="16dp"/>
+            android:textSize="16sp"
+            android:paddingTop="4dp"/>
+
         <TextView
             android:id="@+id/discountedShippingCostTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:paddingTop="16dp"/>
+            android:textSize="16sp"
+            android:paddingTop="4dp"/>
 
-
-        <!-- Hiển thị tổng chi phí cuối cùng -->
+        <!-- Tổng chi phí cuối cùng -->
         <TextView
             android:id="@+id/totalCostTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Total Cost: "
-            android:textSize="18sp"
+            android:text="Tổng chi phí cuối cùng:"
+            android:textSize="20sp"
             android:textStyle="bold"
+            android:textColor="#2E7D32"
             android:paddingTop="16dp"/>
 
         <!-- Nút thanh toán -->
         <Button
             android:id="@+id/checkoutButton"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Checkout"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="16dp" />
-
+            android:text="Thanh Toán"
+            android:textColor="#FFFFFF"
+            android:backgroundTint="#388E3C"
+            android:textSize="18sp"
+            android:padding="12dp"
+            android:elevation="6dp"
+            android:layout_marginTop="16dp"/>
     </LinearLayout>
 </ScrollView>

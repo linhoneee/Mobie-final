@@ -2,4 +2,10 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="lightGray">#D3D3D3</color> <!-- Thêm màu xám nhạt -->
+    <color name="green_primary">#4CAF50</color> <!-- Màu xanh lá cây chủ đạo -->
+    <color name="green_dark">#388E3C</color> <!-- Màu xanh lá cây đậm hơn -->
+    <color name="card_background">#E8F5E9</color> <!-- Màu nền nhẹ cho CardView -->
+    <color name="text_primary">#212121</color> <!-- Màu chữ chính -->
+    <color name="text_secondary">#757575</color> <!-- Màu chữ phụ -->
 </resources>

@@ -45,6 +45,9 @@ public class ChatActivity extends AppCompatActivity {
         ChatViewModelFactory factory = new ChatViewModelFactory(getApplication());
         chatViewModel = new ViewModelProvider(this, factory).get(ChatViewModel.class);
 
+        EditText editTextMessage = findViewById(R.id.editTextMessage);
+
+
         // Quan sát LiveData và cập nhật giao diện khi dữ liệu thay đổi
         chatViewModel.getMessages().observe(this, chatMessages -> {
             adapter.setChatMessages(chatMessages);
@@ -56,11 +59,16 @@ public class ChatActivity extends AppCompatActivity {
         });
 
         findViewById(R.id.buttonSend).setOnClickListener(v -> {
-            String messageText = ((EditText) findViewById(R.id.editTextMessage)).getText().toString();
-            chatViewModel.sendMessage(messageText);
+            String messageText = editTextMessage.getText().toString().trim();
+            if (!messageText.isEmpty()) {
+                chatViewModel.sendMessage(messageText);
 
-            // Cuộn xuống cuối sau khi gửi tin nhắn
-            recyclerView.scrollToPosition(adapter.getItemCount() - 1);
+                // Clear the text in the EditText after sending the message
+                editTextMessage.setText("");
+
+                // Scroll to the bottom after sending the message
+                recyclerView.scrollToPosition(adapter.getItemCount() - 1);
+            }
         });
     }
 

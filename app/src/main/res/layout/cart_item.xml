@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -5,10 +6,9 @@
     android:padding="12dp"
     android:background="#FFFFFF"
     android:elevation="2dp"
-    android:layout_marginBottom="8dp"
-    android:layout_marginTop="8dp">
+    android:layout_marginBottom="8dp">
 
-    <!-- CheckBox cho việc chọn sản phẩm -->
+    <!-- CheckBox để chọn sản phẩm -->
     <CheckBox
         android:id="@+id/cartProductCheckbox"
         android:layout_width="wrap_content"
@@ -22,20 +22,24 @@
         android:orientation="horizontal"
         android:paddingBottom="8dp">
 
+        <!-- Hình ảnh sản phẩm -->
         <ImageView
             android:id="@+id/cartProductImage"
-            android:layout_width="100dp"
-            android:layout_height="100dp"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
             android:scaleType="centerCrop"
             android:layout_gravity="center_vertical"
-            android:layout_marginEnd="8dp" />
+            android:layout_marginEnd="8dp"
+             />
 
+        <!-- Thông tin sản phẩm -->
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:orientation="vertical">
 
+            <!-- Tên sản phẩm -->
             <TextView
                 android:id="@+id/cartProductName"
                 android:layout_width="match_parent"
@@ -44,16 +48,18 @@
                 android:textStyle="bold"
                 android:ellipsize="end"
                 android:maxLines="2"
-                android:textColor="#333333" />
+                android:textColor="#1B5E20" />
 
+            <!-- Giá sản phẩm -->
             <TextView
                 android:id="@+id/cartProductPrice"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textSize="14sp"
-                android:textColor="#888888"
+                android:textColor="#388E3C"
                 android:paddingTop="4dp" />
 
+            <!-- Thông tin kho hàng -->
             <TextView
                 android:id="@+id/cartProductWarehouseIds"
                 android:layout_width="match_parent"
@@ -64,6 +70,7 @@
         </LinearLayout>
     </LinearLayout>
 
+    <!-- Tăng giảm số lượng sản phẩm -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -71,17 +78,19 @@
         android:weightSum="3"
         android:paddingTop="8dp">
 
+        <!-- Nút tăng số lượng -->
         <Button
             android:id="@+id/cartIncreaseQuantityButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="0.5"
             android:text="+"
-            android:background="@drawable/button_background"
+            android:backgroundTint="#4CAF50"
             android:textColor="#FFFFFF"
             android:elevation="2dp"
             android:padding="4dp" />
 
+        <!-- Hiển thị số lượng -->
         <EditText
             android:id="@+id/cartProductQuantity"
             android:layout_width="0dp"
@@ -90,16 +99,17 @@
             android:inputType="number"
             android:textSize="14sp"
             android:gravity="center"
-            android:background="@drawable/edittext_background"
+            android:background="#E0F2F1"
             android:padding="4dp" />
 
+        <!-- Nút giảm số lượng -->
         <Button
             android:id="@+id/cartReduceQuantityButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="0.5"
             android:text="-"
-            android:background="@drawable/button_background"
+            android:backgroundTint="#4CAF50"
             android:textColor="#FFFFFF"
             android:elevation="2dp"
             android:padding="4dp" />

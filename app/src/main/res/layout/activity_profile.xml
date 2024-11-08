@@ -1,0 +1,123 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <!-- Avatar Section -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@color/green_dark"
+            android:padding="24dp"
+            android:gravity="center"
+            android:layout_marginBottom="16dp"
+            android:elevation="4dp"
+            android:clipToPadding="false">
+
+            <ImageView
+                android:id="@+id/profileImage"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:src="@drawable/boy"
+                android:padding="8dp"
+                android:elevation="8dp"
+                android:layout_gravity="center"/>
+
+            <TextView
+                android:id="@+id/tvName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:textColor="@color/white"
+                android:paddingTop="8dp"
+                android:layout_gravity="center" />
+        </LinearLayout>
+
+        <!-- User Information Card -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@color/white"
+            android:padding="16dp"
+            android:elevation="2dp"
+            android:layout_marginBottom="16dp"
+            android:layout_margin="8dp">
+
+            <TextView
+                android:id="@+id/tvEmail"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Email:"
+                android:textColor="@color/green_dark"
+                android:textSize="14sp"
+                android:paddingBottom="4dp" />
+
+            <TextView
+                android:id="@+id/tvBirthday"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Ngày sinh:"
+                android:textColor="@color/green_dark"
+                android:textSize="14sp"
+                android:paddingBottom="4dp" />
+
+            <TextView
+                android:id="@+id/tvGender"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Giới tính:"
+                android:textColor="@color/green_dark"
+                android:textSize="14sp"
+                android:paddingBottom="4dp" />
+        </LinearLayout>
+
+        <!-- Address Section -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingTop="16dp"
+            android:text="Địa chỉ"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="@color/green_dark" />
+
+        <TableLayout
+            android:id="@+id/addressTable"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="12dp"
+            android:layout_marginBottom="16dp"
+            android:background="@color/white"
+            android:elevation="2dp">
+        </TableLayout>
+
+        <!-- Order History Section -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Lịch sử đơn hàng"
+            android:textSize="18sp"
+            android:paddingTop="16dp"
+            android:textStyle="bold"
+            android:textColor="@color/green_dark" />
+
+        <LinearLayout
+            android:id="@+id/orderHistoryContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="12dp"
+            android:elevation="2dp"
+            android:layout_margin="8dp">
+        </LinearLayout>
+
+    </LinearLayout>
+</ScrollView>

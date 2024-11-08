@@ -12,6 +12,22 @@ public class DistanceData {
     private double distance;
     private String route;
 
+    public DistanceData(){
+
+    }
+    // Constructor với tất cả các trường
+    public DistanceData(Long userId, String originName, double originLatitude, double originLongitude, Long warehouseId, String destinationName, double destinationLatitude, double destinationLongitude, double distance, String route) {
+        this.userId = userId;
+        this.originName = originName;
+        this.originLatitude = originLatitude;
+        this.originLongitude = originLongitude;
+        this.warehouseId = warehouseId;
+        this.destinationName = destinationName;
+        this.destinationLatitude = destinationLatitude;
+        this.destinationLongitude = destinationLongitude;
+        this.distance = distance;
+        this.route = route;
+    }
     // Getters and Setters
     public Long getUserId() {
         return userId;

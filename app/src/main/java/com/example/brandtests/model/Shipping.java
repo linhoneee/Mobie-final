@@ -37,5 +37,13 @@ public class Shipping {
     public void setPricePerKg(Double pricePerKg) {
         this.pricePerKg = pricePerKg;
     }
+    public  Shipping (){}
+
+    public Shipping(int id, String name, double pricePerKm, double pricePerKg) {
+        this.id = id;
+        this.name = name;
+        this.pricePerKm = pricePerKm;
+        this.pricePerKg = pricePerKg;
+    }
 // Constructors, getters and setters
 }
