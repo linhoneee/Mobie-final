@@ -32,6 +32,7 @@ public class CartAdapter extends ArrayAdapter<Item> {
     private Long userId;
     private List<Item> selectedItems = new ArrayList<>();
     private Map<Long, String> itemWarehouseIdsMap;
+    private List<Item> items; // Đảm bảo khai báo biến items đúng cách
 
     // Định nghĩa các callback
     public interface OnQuantityChangeListener {
@@ -42,17 +43,29 @@ public class CartAdapter extends ArrayAdapter<Item> {
         void onItemChecked(Item item, boolean isChecked);
     }
 
+    public interface OnItemRemoveListener {
+        void onItemRemoved(Item item);
+    }
+
+    public void updateCart(List<Item> updatedItems) {
+        this.items = updatedItems;
+        notifyDataSetChanged(); // Thông báo Adapter để cập nhật UI
+    }
+
     private OnQuantityChangeListener quantityChangeListener;
     private OnItemCheckListener itemCheckListener;
+    private OnItemRemoveListener itemRemoveListener;
+
 
     // Constructor
     public CartAdapter(@NonNull Context context, @NonNull List<Item> items, Long userId,
                        List<Inventory> inventories, OnQuantityChangeListener quantityChangeListener,
-                       OnItemCheckListener itemCheckListener) {
+                       OnItemCheckListener itemCheckListener, OnItemRemoveListener itemRemoveListener) {
         super(context, 0, items);
         this.userId = userId;
         this.quantityChangeListener = quantityChangeListener;
         this.itemCheckListener = itemCheckListener;
+        this.itemRemoveListener = itemRemoveListener;
 
         itemWarehouseIdsMap = inventories.stream()
                 .collect(Collectors.groupingBy(
@@ -83,11 +96,12 @@ public class CartAdapter extends ArrayAdapter<Item> {
             Button reduceQuantityButton = convertView.findViewById(R.id.cartReduceQuantityButton);
             ImageView productImage = convertView.findViewById(R.id.cartProductImage);
             CheckBox productCheckbox = convertView.findViewById(R.id.cartProductCheckbox);
+            Button removeItemButton = convertView.findViewById(R.id.cartRemoveItemButton);
 
             productName.setText(item.getName());
-            productPrice.setText("Price: $" + item.getPrice().toString());
+            productPrice.setText("Giá: $" + item.getPrice().toString());
             productQuantity.setText(String.valueOf(item.getQuantity()));
-            productWarehouseIds.setText("Warehouse IDs: " + (warehouseIds != null ? warehouseIds : "N/A"));
+            productWarehouseIds.setText("Kho Hàng: " + (warehouseIds != null ? warehouseIds : "N/A"));
 
             // Sử dụng Picasso để tải ảnh từ URL
             if (item.getPrimaryImageUrl() != null && !item.getPrimaryImageUrl().isEmpty()) {
@@ -105,12 +119,14 @@ public class CartAdapter extends ArrayAdapter<Item> {
                 reduceQuantityButton.setEnabled(false);
                 productCheckbox.setEnabled(false);
                 productQuantity.setEnabled(false);
+                removeItemButton.setEnabled(false);
             } else {
                 convertView.setBackgroundColor(Color.WHITE);
                 increaseQuantityButton.setEnabled(true);
                 reduceQuantityButton.setEnabled(true);
                 productCheckbox.setEnabled(true);
                 productQuantity.setEnabled(true);
+                removeItemButton.setEnabled(true);
             }
 
             // Sự kiện khi tăng số lượng
@@ -150,6 +166,13 @@ public class CartAdapter extends ArrayAdapter<Item> {
                             quantityChangeListener.onQuantityChanged(item, newQuantity);
                         }
                     }
+                }
+            });
+
+            // Xử lý sự kiện xóa sản phẩm
+            removeItemButton.setOnClickListener(v -> {
+                if (itemRemoveListener != null) {
+                    itemRemoveListener.onItemRemoved(item);
                 }
             });
 

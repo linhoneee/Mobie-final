@@ -3,13 +3,14 @@ package com.example.brandtests.adapter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.VideoView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.example.brandtests.R;
 import com.example.brandtests.model.ChatMessage;
-
+import com.squareup.picasso.Picasso;
 import java.util.List;
 
 public class ChatMessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
@@ -33,11 +34,10 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     public int getItemViewType(int position) {
         ChatMessage chatMessage = chatMessages.get(position);
 
-        // Kiểm tra null trước khi so sánh
         if (chatMessage.getUserId() != null && chatMessage.getUserId() == loggedInUserId) {
-            return VIEW_TYPE_RIGHT; // Tin nhắn của người dùng đăng nhập
+            return VIEW_TYPE_RIGHT;
         } else {
-            return VIEW_TYPE_LEFT; // Tin nhắn của người khác hoặc hệ thống
+            return VIEW_TYPE_LEFT;
         }
     }
 
@@ -74,16 +74,36 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
         TextView textViewMessage;
         TextView textViewUsername;
+        ImageView imageViewMedia;
+        VideoView videoViewMedia;
 
         public LeftChatMessageViewHolder(@NonNull View itemView) {
             super(itemView);
             textViewMessage = itemView.findViewById(R.id.textViewMessage);
             textViewUsername = itemView.findViewById(R.id.textViewUsername);
+            imageViewMedia = itemView.findViewById(R.id.imageViewMedia);
+            videoViewMedia = itemView.findViewById(R.id.videoViewMedia);
         }
 
         public void bind(ChatMessage chatMessage) {
-            textViewMessage.setText(chatMessage.getText());
             textViewUsername.setText(chatMessage.getUsername());
+            if (chatMessage.getText() != null) {
+                textViewMessage.setText(chatMessage.getText());
+                textViewMessage.setVisibility(View.VISIBLE);
+                imageViewMedia.setVisibility(View.GONE);
+                videoViewMedia.setVisibility(View.GONE);
+            } else if ("image".equals(chatMessage.getMediaType())) {
+                Picasso.get().load(chatMessage.getMediaUrl()).into(imageViewMedia);
+                imageViewMedia.setVisibility(View.VISIBLE);
+                textViewMessage.setVisibility(View.GONE);
+                videoViewMedia.setVisibility(View.GONE);
+            } else if ("video".equals(chatMessage.getMediaType())) {
+                videoViewMedia.setVideoPath(chatMessage.getMediaUrl());
+                videoViewMedia.start();
+                videoViewMedia.setVisibility(View.VISIBLE);
+                textViewMessage.setVisibility(View.GONE);
+                imageViewMedia.setVisibility(View.GONE);
+            }
         }
     }
 
@@ -91,16 +111,36 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
         TextView textViewMessage;
         TextView textViewUsername;
+        ImageView imageViewMedia;
+        VideoView videoViewMedia;
 
         public RightChatMessageViewHolder(@NonNull View itemView) {
             super(itemView);
             textViewMessage = itemView.findViewById(R.id.textViewMessage);
             textViewUsername = itemView.findViewById(R.id.textViewUsername);
+            imageViewMedia = itemView.findViewById(R.id.imageViewMedia);
+            videoViewMedia = itemView.findViewById(R.id.videoViewMedia);
         }
 
         public void bind(ChatMessage chatMessage) {
-            textViewMessage.setText(chatMessage.getText());
             textViewUsername.setText(chatMessage.getUsername());
+            if (chatMessage.getText() != null) {
+                textViewMessage.setText(chatMessage.getText());
+                textViewMessage.setVisibility(View.VISIBLE);
+                imageViewMedia.setVisibility(View.GONE);
+                videoViewMedia.setVisibility(View.GONE);
+            } else if ("image".equals(chatMessage.getMediaType())) {
+                Picasso.get().load(chatMessage.getMediaUrl()).into(imageViewMedia);
+                imageViewMedia.setVisibility(View.VISIBLE);
+                textViewMessage.setVisibility(View.GONE);
+                videoViewMedia.setVisibility(View.GONE);
+            } else if ("video".equals(chatMessage.getMediaType())) {
+                videoViewMedia.setVideoPath(chatMessage.getMediaUrl());
+                videoViewMedia.start();
+                videoViewMedia.setVisibility(View.VISIBLE);
+                textViewMessage.setVisibility(View.GONE);
+                imageViewMedia.setVisibility(View.GONE);
+            }
         }
     }
 }

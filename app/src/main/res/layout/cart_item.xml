@@ -1,45 +1,75 @@
-<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:padding="12dp"
+    android:padding="16dp"
     android:background="#FFFFFF"
-    android:elevation="2dp"
-    android:layout_marginBottom="8dp">
+    android:elevation="4dp"
+    android:layout_marginBottom="12dp"
+    android:layout_gravity="center">
 
-    <!-- CheckBox để chọn sản phẩm -->
-    <CheckBox
-        android:id="@+id/cartProductCheckbox"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="end"
-        android:padding="8dp" />
-
+    <!-- CheckBox to select product -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:paddingBottom="8dp">
+        android:gravity="end|center_vertical">
 
-        <!-- Hình ảnh sản phẩm -->
+        <!-- Remove Item Button -->
+        <CheckBox
+            android:id="@+id/cartProductCheckbox"
+            android:layout_width="285dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:layout_marginBottom="8dp"
+            android:buttonTint="#4CAF50"
+            android:padding="8dp"
+            android:text="Chọn sản phẩm"
+            android:textColor="#388E3C"
+            android:textSize="14sp" />
+
+        <Button
+            android:id="@+id/cartRemoveItemButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="8dp"
+            android:backgroundTint="#FFEBEE"
+            android:elevation="2dp"
+            android:text="Xóa"
+            android:textColor="#D32F2F"
+            android:textSize="14sp" />
+    </LinearLayout>
+
+    <!-- Product Info Section -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingBottom="12dp"
+        android:gravity="center_vertical"
+        android:background="#F1F8E9"
+        android:padding="12dp"
+        android:elevation="2dp"
+        android:layout_marginBottom="12dp">
+
+        <!-- Product Image -->
         <ImageView
             android:id="@+id/cartProductImage"
             android:layout_width="80dp"
             android:layout_height="80dp"
             android:scaleType="centerCrop"
-            android:layout_gravity="center_vertical"
-            android:layout_marginEnd="8dp"
-             />
+            android:layout_marginEnd="12dp"
+            android:contentDescription="Hình ảnh sản phẩm" />
 
-        <!-- Thông tin sản phẩm -->
+        <!-- Product Information -->
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:paddingEnd="8dp">
 
-            <!-- Tên sản phẩm -->
+            <!-- Product Name -->
             <TextView
                 android:id="@+id/cartProductName"
                 android:layout_width="match_parent"
@@ -48,71 +78,78 @@
                 android:textStyle="bold"
                 android:ellipsize="end"
                 android:maxLines="2"
-                android:textColor="#1B5E20" />
+                android:textColor="#1B5E20"
+                android:paddingBottom="4dp" />
 
-            <!-- Giá sản phẩm -->
+            <!-- Product Price -->
             <TextView
                 android:id="@+id/cartProductPrice"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textSize="14sp"
                 android:textColor="#388E3C"
-                android:paddingTop="4dp" />
+                android:paddingBottom="4dp" />
 
-            <!-- Thông tin kho hàng -->
+            <!-- Warehouse Information -->
             <TextView
                 android:id="@+id/cartProductWarehouseIds"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textSize="14sp"
-                android:textColor="#FF5722"
-                android:paddingTop="4dp" />
+                android:textColor="#FF5722" />
         </LinearLayout>
     </LinearLayout>
 
-    <!-- Tăng giảm số lượng sản phẩm -->
+    <!-- Quantity Adjustment Section -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:weightSum="3"
-        android:paddingTop="8dp">
+        android:paddingTop="8dp"
+        android:paddingBottom="16dp"
+        android:gravity="center_vertical"
+        android:background="#F1F8E9"
+        android:elevation="2dp">
 
-        <!-- Nút tăng số lượng -->
-        <Button
-            android:id="@+id/cartIncreaseQuantityButton"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="0.5"
-            android:text="+"
-            android:backgroundTint="#4CAF50"
-            android:textColor="#FFFFFF"
-            android:elevation="2dp"
-            android:padding="4dp" />
-
-        <!-- Hiển thị số lượng -->
-        <EditText
-            android:id="@+id/cartProductQuantity"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="0.8"
-            android:inputType="number"
-            android:textSize="14sp"
-            android:gravity="center"
-            android:background="#E0F2F1"
-            android:padding="4dp" />
-
-        <!-- Nút giảm số lượng -->
+        <!-- Decrease Quantity Button -->
         <Button
             android:id="@+id/cartReduceQuantityButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="0.5"
+            android:layout_weight="0.3"
             android:text="-"
-            android:backgroundTint="#4CAF50"
+            android:textSize="22sp"
+            android:backgroundTint="#388E3C"
             android:textColor="#FFFFFF"
             android:elevation="2dp"
-            android:padding="4dp" />
+            android:layout_marginEnd="8dp" />
+
+        <!-- Display Quantity -->
+        <EditText
+            android:id="@+id/cartProductQuantity"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="8dp"
+            android:layout_weight="0.4"
+            android:elevation="2dp"
+            android:gravity="center"
+            android:inputType="number"
+            android:textColor="#1B5E20"
+            android:textSize="16sp"
+            android:padding="12dp" />
+
+        <!-- Increase Quantity Button -->
+        <Button
+            android:id="@+id/cartIncreaseQuantityButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.3"
+            android:text="+"
+            android:textSize="22sp"
+            android:backgroundTint="#388E3C"
+            android:textColor="#FFFFFF"
+            android:elevation="2dp"
+            android:layout_marginStart="8dp" />
     </LinearLayout>
 
 </LinearLayout>

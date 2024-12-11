@@ -58,17 +58,17 @@ public class CartViewModel extends ViewModel {
             @Override
             public void onResponse(Call<Cart> call, Response<Cart> response) {
                 if (response.isSuccessful()) {
-                    addItemResult.setValue("Item added to cart successfully.");
-                    Log.d(TAG, "Item added to cart successfully: " + response.body());
+                    addItemResult.setValue("thêm sản phẩm thành công .");
+                    Log.d(TAG, "Thêm sản phẩm thành công: " + response.body());
                 } else {
-                    addItemResult.setValue("Failed to add item to cart.");
+                    addItemResult.setValue("thêm sản phẩm thất bại.");
                     Log.e(TAG, "Failed to add item to cart: " + response.code() + " " + response.message());
                 }
             }
 
             @Override
             public void onFailure(Call<Cart> call, Throwable t) {
-                addItemResult.setValue("Error adding item to cart: " + t.getMessage());
+                addItemResult.setValue("lỗi khi thêm: " + t.getMessage());
                 Log.e(TAG, "Error adding item to cart", t);
             }
         });
@@ -79,10 +79,10 @@ public class CartViewModel extends ViewModel {
             @Override
             public void onResponse(Call<Cart> call, Response<Cart> response) {
                 if (response.isSuccessful()) {
-                    addItemResult.setValue("Item reduced in cart successfully.");
+                    addItemResult.setValue("Giảm sản phẩm thành công.");
                     Log.d(TAG, "Item reduced in cart successfully: " + response.body());
                 } else {
-                    addItemResult.setValue("Failed to reduce item in cart.");
+                    addItemResult.setValue("giảm sản phẩm thất bại.");
                     Log.e(TAG, "Failed to reduce item in cart: " + response.code() + " " + response.message());
                 }
             }
@@ -102,7 +102,7 @@ public class CartViewModel extends ViewModel {
                 if (response.isSuccessful() && response.body() != null) {
                     cart.setValue(response.body());
                 } else {
-                    Log.e(TAG, "Failed to fetch cart: " + response.code() + " " + response.message());
+                    Log.e(TAG, "không thể tải giỏ hàng: " + response.code() + " " + response.message());
                 }
             }
 
@@ -162,19 +162,71 @@ public class CartViewModel extends ViewModel {
     public void groupItemsByWarehouse(List<Item> selectedItems, Map<Long, String> itemWarehouseIdsMap) {
         Map<String, List<Item>> groupedItems = new HashMap<>();
 
+        // Log incoming data
+        Log.d(TAG, "Selected Items: ");
+        for (Item item : selectedItems) {
+            Log.d(TAG, "Item: " + item.getName() + ", ProductId: " + item.getProductId());
+        }
+
+        Log.d(TAG, "Item-Warehouse ID Map: ");
+        for (Map.Entry<Long, String> entry : itemWarehouseIdsMap.entrySet()) {
+            Log.d(TAG, "ProductId: " + entry.getKey() + " -> WarehouseIds: " + entry.getValue());
+        }
+
+        // Process and group items by warehouse
         for (Item item : selectedItems) {
             String warehouseIds = itemWarehouseIdsMap.get(item.getProductId());
             if (warehouseIds != null) {
+                // Log warehouse IDs for each item
+                Log.d(TAG, "Item: " + item.getName() + " has Warehouse IDs: " + warehouseIds);
+
                 String[] warehouseIdArray = warehouseIds.split(",");
                 for (String warehouseId : warehouseIdArray) {
-                    groupedItems.putIfAbsent(warehouseId, new ArrayList<>());
+                    groupedItems.putIfAbsent(warehouseId, new ArrayList<>()); //putIfAbsent là kiểm tra nếu không có thì tạo mới key với value này trong array
                     groupedItems.get(warehouseId).add(item);
+
+                    // Log item being added to a warehouse
+                    Log.d(TAG, "Adding item to Warehouse: " + warehouseId);
                 }
             } else {
-                Log.e(TAG, "Warehouse IDs is null for item: " + item.getName());
+                Log.e(TAG, "Warehouse IDs are null for item: " + item.getName());
             }
         }
 
+        // Log grouped items
+        Log.d(TAG, "Grouped Items by Warehouse: ");
+        for (Map.Entry<String, List<Item>> entry : groupedItems.entrySet()) {
+            Log.d(TAG, "Warehouse: " + entry.getKey() + " contains " + entry.getValue().size() + " items.");
+            for (Item item : entry.getValue()) {
+                Log.d(TAG, "  Item: " + item.getName() + ", ProductId: " + item.getProductId());
+            }
+        }
+
+        // Set grouped items to warehouseGroups
         warehouseGroups.setValue(groupedItems);
+        Log.d(TAG, "Grouped items set to warehouseGroups.");
     }
+
+
+    // Thêm phương thức clearCart
+    public void clearProductInCart(Long userId, Item item) {
+        cartService.removeItemFromCart(userId, item).enqueue(new Callback<Cart>() {
+            @Override
+            public void onResponse(Call<Cart> call, Response<Cart> response) {
+                if (response.isSuccessful()) {
+                    // Xử lý thành công
+                    fetchCart(userId);  // Lấy lại giỏ hàng
+                } else {
+                    // Xử lý thất bại
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Cart> call, Throwable t) {
+                // Xử lý khi lỗi
+            }
+        });
+    }
+
+
 }

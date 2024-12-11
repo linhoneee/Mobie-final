@@ -9,6 +9,7 @@ import android.os.Looper;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
@@ -43,6 +44,7 @@ public class ProductActivity extends AppCompatActivity {
     private ViewPager2 bannerViewPager;
     private Handler bannerHandler;
     private Runnable bannerRunnable;
+    private LinearLayout headerButtonsContainer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,18 +54,18 @@ public class ProductActivity extends AppCompatActivity {
         sharedPreferences = getSharedPreferences("LoginPrefs", Context.MODE_PRIVATE);
         userId = sharedPreferences.getLong("UserID", -1);
 
-        // Khởi tạo các thành phần giao diện từ XML
         loginButton = findViewById(R.id.bbuttonLogin);
         logoutButton = findViewById(R.id.bbuttonLogout);
         cartButton = findViewById(R.id.bbuttonCart);
         chatButton = findViewById(R.id.bbuttonChat);
         bannerViewPager = findViewById(R.id.bannerViewPager);
         profileButon = findViewById(R.id.bbuttonProfile);
-        // Gọi phương thức setupBanner để khởi tạo ViewPager cho banner
+        headerButtonsContainer = findViewById(R.id.headerButtonsContainer); // Nhóm button
+
         setupBanner();
 
         ListView listView = findViewById(R.id.listViewProducts);
-        checkIfLoggedIn();  // Gọi hàm kiểm tra đăng nhập sau khi khởi tạo các nút
+        checkIfLoggedIn();
 
         productViewModel = new ViewModelProvider(this, new ProductViewModelFactory(RetrofitClient.getProductService()))
                 .get(ProductViewModel.class);
@@ -73,16 +75,16 @@ public class ProductActivity extends AppCompatActivity {
                 new CartViewModelFactory(CartRetrofitClient.getCartService(), InventoryRetrofitClient.getInventoryService())
         ).get(CartViewModel.class);
 
-        // Lấy danh sách sản phẩm và tồn kho từ ViewModel
         cartViewModel.fetchInventories();
 
         productViewModel.getProducts().observe(this, products -> {
             if (products != null) {
                 cartViewModel.getInventories().observe(this, inventories -> {
                     if (inventories != null) {
-                        // Khởi tạo ProductAdapter với thông tin tồn kho
                         ProductAdapter adapter = new ProductAdapter(this, products, userId, inventories, productDTOuser -> {
-                            if (productDTOuser != null && productDTOuser.getProduct() != null) {
+                            if (userId == -1) {
+                                Toast.makeText(this, "Vui lòng đăng nhập để thêm vào giỏ hàng.", Toast.LENGTH_SHORT).show();
+                            } else if (productDTOuser != null && productDTOuser.getProduct() != null) {
                                 Item item = new Item(
                                         productDTOuser.getProduct().getId(),
                                         productDTOuser.getProduct().getProductName(),
@@ -94,6 +96,7 @@ public class ProductActivity extends AppCompatActivity {
                                 cartViewModel.addItemToCart(userId, item);
                             }
                         });
+
                         listView.setAdapter(adapter);
                     }
                 });
@@ -113,7 +116,7 @@ public class ProductActivity extends AppCompatActivity {
                 intent.putExtra("userId", userId);
                 startActivity(intent);
             } else {
-                Toast.makeText(ProductActivity.this, "User not logged in!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(ProductActivity.this, "Người dùng chưa đăng nhập!", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -123,7 +126,7 @@ public class ProductActivity extends AppCompatActivity {
                 intent.putExtra("userId", userId);
                 startActivity(intent);
             } else {
-                Toast.makeText(ProductActivity.this, "User not logged in!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(ProductActivity.this, "Người dùng chưa đăng nhập!", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -133,13 +136,13 @@ public class ProductActivity extends AppCompatActivity {
                 intent.putExtra("userId", userId);
                 startActivity(intent);
             } else {
-                Toast.makeText(ProductActivity.this, "User not logged in!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(ProductActivity.this, "Người dùng chưa đăng nhập!", Toast.LENGTH_SHORT).show();
             }
         });
     }
 
     private void setupBanner() {
-        List<Integer> bannerImages = Arrays.asList(R.drawable.image1, R.drawable.image2, R.drawable.image3);
+        List<Integer> bannerImages = Arrays.asList(R.drawable.q15, R.drawable.q15, R.drawable.q16);
         BannerAdapter bannerAdapter = new BannerAdapter(bannerImages);
         bannerViewPager.setAdapter(bannerAdapter);
 
@@ -167,13 +170,12 @@ public class ProductActivity extends AppCompatActivity {
         boolean isLoggedIn = sharedPreferences.getBoolean("isLoggedIn", false);
         loginButton.setVisibility(isLoggedIn ? View.GONE : View.VISIBLE);
         logoutButton.setVisibility(isLoggedIn ? View.VISIBLE : View.GONE);
-        cartButton.setVisibility(isLoggedIn ? View.VISIBLE : View.GONE);
-        chatButton.setVisibility(isLoggedIn ? View.VISIBLE : View.GONE);
+        headerButtonsContainer.setVisibility(isLoggedIn ? View.VISIBLE : View.GONE);
     }
 
     private void logoutUser() {
         sharedPreferences.edit().clear().apply();
-        Toast.makeText(ProductActivity.this, "Logged out successfully", Toast.LENGTH_SHORT).show();
+        Toast.makeText(ProductActivity.this, "Đăng xuất thành công", Toast.LENGTH_SHORT).show();
         checkIfLoggedIn();
     }
 

@@ -67,7 +67,7 @@ public class NotificationHelper {
 
         } else {
             // Thông báo người dùng nếu quyền không được cấp
-            Toast.makeText(context, "Notification permission not granted", Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, "Quyền thông báo chưa được cấp", Toast.LENGTH_SHORT).show();
         }
     }
 }

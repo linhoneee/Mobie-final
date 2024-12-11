@@ -31,12 +31,10 @@ public class ChatViewModel extends AndroidViewModel {
         long userId = sharedPreferences.getLong("UserID", -1);
         webSocketService = new WebSocketService(this::onNewMessageReceived);
 
-        // Kết nối WebSocket với userId làm roomId
         webSocketService.connectWebSocket(userId);
 
         chatService = ChatRetrofitClient.getClient().create(ChatService.class);
 
-        // Gọi API để lấy danh sách tin nhắn theo roomId (ở đây là userId)
         loadMessagesByRoomId(userId);
     }
 
@@ -46,12 +44,10 @@ public class ChatViewModel extends AndroidViewModel {
             public void onResponse(Call<List<ChatMessage>> call, Response<List<ChatMessage>> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     Log.d(TAG, "Messages loaded successfully");
-                    messages.postValue(response.body()); // Cập nhật LiveData để hiển thị tin nhắn
+                    messages.postValue(response.body());
                 } else {
                     try {
-                        // Chuyển đổi errorBody thành chuỗi để xem chi tiết lỗi
                         if (response.errorBody() != null) {
-                            // Chuyển đổi nội dung errorBody thành chuỗi
                             String errorBody = response.errorBody().string();
                             Log.e(TAG, "Failed to load messages: " + errorBody);
                         } else {
@@ -73,23 +69,11 @@ public class ChatViewModel extends AndroidViewModel {
 
     private void onNewMessageReceived(String jsonMessage) {
         try {
-            // Kiểm tra nếu tin nhắn là JSON Object
-            if (jsonMessage.trim().startsWith("{")) {
                 ChatMessage message = new Gson().fromJson(jsonMessage, ChatMessage.class);
                 Log.d(TAG, "Received JSON message: " + message.getText());
                 List<ChatMessage> currentMessages = messages.getValue();
                 currentMessages.add(message);
                 messages.postValue(currentMessages);
-            } else {
-                // Nếu không phải là JSON Object, xử lý như một chuỗi văn bản thuần túy
-                ChatMessage plainTextMessage = new ChatMessage();
-                plainTextMessage.setText(jsonMessage);
-                plainTextMessage.setUsername("System"); // Hoặc sử dụng một username phù hợp, hoặc để trống
-                Log.d(TAG, "Received plain text message: " + jsonMessage);
-                List<ChatMessage> currentMessages = messages.getValue();
-                currentMessages.add(plainTextMessage);
-                messages.postValue(currentMessages);
-            }
         } catch (Exception e) {
             Log.e(TAG, "Failed to parse message", e);
         }

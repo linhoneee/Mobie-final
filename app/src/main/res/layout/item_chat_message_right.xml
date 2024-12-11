@@ -1,11 +1,11 @@
-<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:gravity="end"
     android:orientation="vertical"
     android:padding="12dp"
-    android:background="#E0F2F1">
+    android:background="#E0F2F1"
+    android:layout_gravity="end"
+    android:gravity="end">
 
     <TextView
         android:id="@+id/textViewUsername"
@@ -13,16 +13,40 @@
         android:layout_height="wrap_content"
         android:textStyle="bold"
         android:textSize="16sp"
-        android:textColor="#1B5E20" />
+        android:textColor="#388E3C"
+        android:gravity="end"
+        android:textAlignment="viewEnd"
+        android:layout_marginEnd="8dp" />
 
     <TextView
         android:id="@+id/textViewMessage"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="14sp"
-        android:textColor="#388E3C"
-        android:background="#A5D6A7"
-        android:padding="10dp"
+        android:textSize="16sp"
+        android:textColor="#1B5E20"
+        android:padding="16dp"
         android:layout_marginVertical="4dp"
-        android:layout_marginHorizontal="8dp" />
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="48dp"
+        android:gravity="end"
+        android:textAlignment="viewEnd"
+        android:elevation="2dp"
+        android:background="@drawable/message_bubble_background" />
+
+    <ImageView
+        android:id="@+id/imageViewMedia"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:layout_marginTop="8dp"
+        android:visibility="gone"
+        android:scaleType="centerCrop"
+        android:background="@drawable/media_background" />
+
+    <VideoView
+        android:id="@+id/videoViewMedia"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:layout_marginTop="8dp"
+        android:visibility="gone"
+        android:background="@drawable/media_background" />
 </LinearLayout>

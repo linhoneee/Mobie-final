@@ -27,31 +27,11 @@ import retrofit2.Response;
 public class CheckoutViewModel extends ViewModel {
 
     private static final String TAG = "CheckoutViewModel";
-    private MutableLiveData<Map<String, List<Item>>> warehouseGroups = new MutableLiveData<>();
     private MutableLiveData<DistanceRecord> distanceRecord = new MutableLiveData<>();
-    private MutableLiveData<Double> shippingCost = new MutableLiveData<>();
-    private MutableLiveData<Double> totalCost = new MutableLiveData<>();
-    private MutableLiveData<Double> productTotal = new MutableLiveData<>();
-    private MutableLiveData<DiscountResult> discountResult = new MutableLiveData<>();
+
 
     public LiveData<DistanceRecord> getDistanceRecord() {
         return distanceRecord;
-    }
-
-    public LiveData<Double> getShippingCost() {
-        return shippingCost;
-    }
-
-    public LiveData<Double> getTotalCost() {
-        return totalCost;
-    }
-
-    public LiveData<Double> getProductTotal() {
-        return productTotal;
-    }
-
-    public LiveData<DiscountResult> getDiscountResult() {
-        return discountResult;
     }
 
     // Tính toán khoảng cách và cập nhật DistanceRecord
@@ -74,51 +54,6 @@ public class CheckoutViewModel extends ViewModel {
             public void onFailure(Call<DistanceRecord> call, Throwable t) {
                 Log.e(TAG, "Error fetching distance: API call failed", t);
                 distanceRecord.postValue(null);
-            }
-        });
-    }
-
-    // Tính toán chi phí vận chuyển và tổng chi phí đơn hàng
-    public void calculateShippingCost(Shipping selectedShipping, DistanceRecord distanceRecord, double totalWeight) {
-        double distance = distanceRecord != null ? distanceRecord.getDistance() : 0.0;
-        double shippingCostValue = (selectedShipping.getPricePerKm() * distance) + (selectedShipping.getPricePerKg() * totalWeight);
-        shippingCost.setValue(shippingCostValue);
-        calculateTotalCost();
-    }
-
-    public void setProductTotal(double total) {
-        productTotal.setValue(total);
-        calculateTotalCost();
-    }
-
-    private void calculateTotalCost() {
-        double total = (productTotal.getValue() != null ? productTotal.getValue() : 0.0) +
-                (shippingCost.getValue() != null ? shippingCost.getValue() : 0.0);
-        totalCost.setValue(total);
-    }
-
-    // Áp dụng mã giảm giá
-    public void applyCoupon(String couponCode, double productTotal, double shippingCost) {
-        ApplyCouponRequest request = new ApplyCouponRequest();
-        request.setCode(couponCode);
-        request.setOrderValue(productTotal);
-        request.setShippingCost(shippingCost);
-
-        CustomerCouponService service = CustomerCouponRetrofitClient.getCustomerCouponService();
-        Call<DiscountResult> call = service.applyCoupon(request);
-        call.enqueue(new Callback<DiscountResult>() {
-            @Override
-            public void onResponse(Call<DiscountResult> call, Response<DiscountResult> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    discountResult.setValue(response.body());
-                } else {
-                    discountResult.setValue(null);
-                }
-            }
-
-            @Override
-            public void onFailure(Call<DiscountResult> call, Throwable t) {
-                discountResult.setValue(null);
             }
         });
     }

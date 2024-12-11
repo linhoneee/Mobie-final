@@ -21,17 +21,15 @@ public class WebSocketService {
         void onMessage(String message);
     }
 
-    // Constructor để khởi tạo WebSocketService với MessageCallback
     public WebSocketService(MessageCallback callback) {
         this.callback = callback;
     }
 
-    // Phương thức kết nối WebSocket
     public void connectWebSocket(Long userId) {
         client = new OkHttpClient();
         Request request = new Request.Builder()
                 .url("ws://10.0.2.2:6010/native-ws")
-                .addHeader("RoomID", userId.toString())  // Truyền RoomID qua tiêu đề
+                .addHeader("RoomID", userId.toString())
                 .build();
         webSocket = client.newWebSocket(request, new WebSocketListener() {
             @Override
@@ -70,14 +68,5 @@ public class WebSocketService {
         }
     }
 
-    // Phương thức đóng WebSocket
-    public void closeWebSocket() {
-        if (webSocket != null) {
-            webSocket.close(1000, "Closing");
-            Log.d(TAG, "Closing WebSocket");
-        }
-        if (client != null) {
-            client.dispatcher().executorService().shutdown();
-        }
-    }
+
 }

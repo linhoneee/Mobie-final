@@ -48,11 +48,9 @@ public class ChatActivity extends AppCompatActivity {
         EditText editTextMessage = findViewById(R.id.editTextMessage);
 
 
-        // Quan sát LiveData và cập nhật giao diện khi dữ liệu thay đổi
         chatViewModel.getMessages().observe(this, chatMessages -> {
             adapter.setChatMessages(chatMessages);
 
-            // Cuộn xuống cuối cùng khi dữ liệu thay đổi
             if (chatMessages != null && !chatMessages.isEmpty()) {
                 recyclerView.scrollToPosition(chatMessages.size() - 1);
             }

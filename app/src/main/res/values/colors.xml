@@ -8,4 +8,6 @@
     <color name="card_background">#E8F5E9</color> <!-- Màu nền nhẹ cho CardView -->
     <color name="text_primary">#212121</color> <!-- Màu chữ chính -->
     <color name="text_secondary">#757575</color> <!-- Màu chữ phụ -->
+    <color name="green">#4CAF50</color>
+
 </resources>

@@ -61,10 +61,12 @@
 
             <!-- Cart, Chat, and Profile Icons with Labels -->
             <LinearLayout
+                android:id="@+id/headerButtonsContainer"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:gravity="center">
+                android:gravity="center"
+                android:visibility="gone"> <!-- Mặc định ẩn -->
 
                 <!-- Cart Icon and Label -->
                 <LinearLayout
@@ -115,7 +117,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:gravity="center_horizontal"
-                        android:text="Chat"
+                        android:text="Nhắn tin"
                         android:textColor="#4CAF50"
                         android:textSize="12sp" />
                 </LinearLayout>
@@ -141,7 +143,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:gravity="center_horizontal"
-                        android:text="Profile"
+                        android:text="Hồ sơ"
                         android:textColor="#4CAF50"
                         android:textSize="12sp" />
                 </LinearLayout>
@@ -207,7 +209,7 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:gravity="center"
-            android:layout_marginTop="24dp"
+            android:layout_marginTop="15dp"
             android:layout_marginBottom="16dp"
             android:weightSum="2">
 
@@ -243,13 +245,11 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="GreenHome - Hãy cùng sống xanh vì hành tinh của chúng ta!"
-            android:textSize="14sp"
-            android:textColor="#1B5E20"
+            android:layout_gravity="center"
             android:fontFamily="sans-serif"
             android:gravity="center"
-            android:layout_gravity="center"
-            android:layout_marginTop="24dp"
-            android:paddingBottom="16dp" />
+            android:text="GreenHome - Hãy cùng sống xanh vì hành tinh của chúng ta!"
+            android:textColor="#1B5E20"
+            android:textSize="14sp" />
     </LinearLayout>
 </ScrollView>

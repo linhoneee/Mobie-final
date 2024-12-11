@@ -12,16 +12,15 @@
     <!-- Ảnh sản phẩm -->
     <ImageView
         android:id="@+id/checkoutProductImage"
-        android:layout_width="64dp"
-        android:layout_height="64dp"
+        android:layout_width="105dp"
+        android:layout_height="95dp"
         android:layout_marginEnd="8dp"
-        android:scaleType="centerCrop"
-         />
+        android:scaleType="centerCrop" />
 
     <!-- Thông tin sản phẩm -->
     <LinearLayout
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="98dp"
         android:layout_weight="1"
         android:orientation="vertical">
 
@@ -29,22 +28,22 @@
             android:id="@+id/checkoutProductName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:textColor="#333333"
             android:textSize="16sp"
-            android:textStyle="bold"
-            android:textColor="#333333"/>
+            android:textStyle="bold" />
 
         <TextView
             android:id="@+id/checkoutProductPrice"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="14sp"
-            android:textColor="#4CAF50"/>
+            android:textColor="#4CAF50"
+            android:textSize="14sp" />
 
         <TextView
             android:id="@+id/checkoutProductQuantity"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="14sp"
-            android:textColor="#757575"/>
+            android:textColor="#757575"
+            android:textSize="14sp" />
     </LinearLayout>
 </LinearLayout>

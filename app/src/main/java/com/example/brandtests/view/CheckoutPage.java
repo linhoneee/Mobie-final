@@ -7,6 +7,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -86,14 +87,8 @@ public class CheckoutPage extends AppCompatActivity {
 
         viewModel = new ViewModelProvider(this).get(CheckoutViewModel.class);
 
-        TextView warehouseIdTextView = findViewById(R.id.selectedWarehouseId);
         ListView selectedItemsListView = findViewById(R.id.selectedItemsListView);
         TextView distanceTextView = findViewById(R.id.distanceTextView);
-        TextView tvReceiverName = findViewById(R.id.tvReceiverName);
-        TextView tvFullAddress = findViewById(R.id.tvFullAddress);
-        TextView tvWarehouseName = findViewById(R.id.tvWarehouseName);
-        TextView warehouseAddress = findViewById(R.id.warehouseAddress);
-        TextView route = findViewById(R.id.route);
         totalTextView = findViewById(R.id.totalTextView);
         shippingCostTextView = findViewById(R.id.shippingCostTextView);
         totalCostTextView = findViewById(R.id.totalCostTextView);
@@ -126,8 +121,30 @@ public class CheckoutPage extends AppCompatActivity {
         selectedGroupItems = getIntent().getParcelableArrayListExtra("selectedGroupItems");
         adapter = new CheckoutAdapter(this, selectedGroupItems); // Khởi tạo adapter
         selectedItemsListView.setAdapter(adapter);
-        warehouseIdTextView.setText("Warehouse ID: " + selectedWarehouseId);
-        totalTextView.setText("Product Total: $" + String.format("%.2f", adapter.getTotalPrice()));
+
+        // Sau khi danh sách được cập nhật, tính toán tổng chiều cao của các mục
+        selectedItemsListView.post(new Runnable() {
+            @Override
+            public void run() {
+                int totalHeight = 0;
+                for (int i = 0; i < selectedItemsListView.getAdapter().getCount(); i++) {
+                    View listItem = selectedItemsListView.getAdapter().getView(i, null, selectedItemsListView);
+                    listItem.measure(0, 0); // Đo kích thước của item
+                    totalHeight += listItem.getMeasuredHeight();
+                }
+
+                // Thêm khoảng cách cho divider (nếu có)
+                totalHeight += (selectedItemsListView.getDividerHeight() * (selectedItemsListView.getAdapter().getCount() - 1));
+
+                // Cập nhật chiều cao của ListView
+                ViewGroup.LayoutParams params = selectedItemsListView.getLayoutParams();
+                params.height = totalHeight;
+                selectedItemsListView.setLayoutParams(params);
+            }
+        });
+
+
+        totalTextView.setText("Tiền sản phẩm: $" + String.format("%.2f", adapter.getTotalPrice()));
         finalTotalCost = adapter.getTotalPrice(); // Cập nhật tổng chi phí cuối cùng
 
         // Tính toán khoảng cách ban đầu dựa trên địa chỉ chính
@@ -167,7 +184,6 @@ public class CheckoutPage extends AppCompatActivity {
                     distanceData.setDestinationLatitude(distanceRecord.getDestinationLatitude());
                     distanceData.setDestinationLongitude(distanceRecord.getDestinationLongitude());
                     distanceData.setDistance(distanceRecord.getDistance());
-                    distanceData.setRoute(distanceRecord.getRoute());
 
                     PaymentRequest paymentRequest = new PaymentRequest(
                             1L,
@@ -191,7 +207,7 @@ public class CheckoutPage extends AppCompatActivity {
                                     Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(responseBody));
                                     startActivity(browserIntent);
                                 } else {
-                                    Toast.makeText(CheckoutPage.this, "Unexpected response format", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(CheckoutPage.this, "Định dạng phản hồi không mong đợi", Toast.LENGTH_SHORT).show();
                                     Log.e(TAG, "Unexpected response: " + responseBody);
                                 }
                             } else {
@@ -213,11 +229,11 @@ public class CheckoutPage extends AppCompatActivity {
                     });
 
                 } catch (Exception e) {
-                    Toast.makeText(CheckoutPage.this, "An error occurred: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(CheckoutPage.this, "Đã xảy ra lỗi: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                     Log.e(TAG, "An error occurred while preparing payment request", e);
                 }
             } else {
-                Toast.makeText(CheckoutPage.this, "Failed to fetch distance data", Toast.LENGTH_SHORT).show();
+                Toast.makeText(CheckoutPage.this, "Không thể lấy dữ liệu khoảng cách", Toast.LENGTH_SHORT).show();
                 Log.e(TAG, "DistanceRecord is null when trying to create payment request");
             }
         });
@@ -252,17 +268,17 @@ public class CheckoutPage extends AppCompatActivity {
             public void onResponse(Call<Address> call, Response<Address> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     Address primaryAddress = response.body();
-                    primaryAddressTextView.setText("Primary Address: " + primaryAddress.getFullAddress());
+                    primaryAddressTextView.setText("Địa chỉ chính: " + primaryAddress.getFullAddress());
                     calculateDistanceWithFullAddress(primaryAddress);
                 } else {
-                    primaryAddressTextView.setText("Primary Address: Not found");
+                    primaryAddressTextView.setText("Không tìm thấy địa chỉ chính");
                     Log.e(TAG, "Failed to load primary address. Response code: " + response.code());
                 }
             }
 
             @Override
             public void onFailure(Call<Address> call, Throwable t) {
-                primaryAddressTextView.setText("Primary Address: Error loading");
+                primaryAddressTextView.setText("Lỗi khi tải");
                 Log.e(TAG, "Error fetching primary address", t);
             }
         });
@@ -281,29 +297,51 @@ public class CheckoutPage extends AppCompatActivity {
                         addressArray[i] = addresses.get(i).getFullAddress();
                     }
 
+                    // Tạo dialog builder
                     AlertDialog.Builder builder = new AlertDialog.Builder(CheckoutPage.this);
-                    builder.setTitle("Select Address")
-                            .setItems(addressArray, (dialog, which) -> {
-                                Address selectedAddress = addresses.get(which);
-                                primaryAddressTextView.setText("Primary Address: " + selectedAddress.getFullAddress());
-                                calculateDistanceWithFullAddress(selectedAddress);
-                            })
-                            .setNegativeButton("Cancel", null)
-                            .create()
-                            .show();
+                    View customView = getLayoutInflater().inflate(R.layout.address_dialog_layout, null);
+
+                    // Ánh xạ các thành phần trong layout
+                    TextView dialogTitle = customView.findViewById(R.id.dialogTitle);
+                    ListView dialogListView = customView.findViewById(R.id.dialogListView);
+                    Button cancelButton = customView.findViewById(R.id.cancelButton);
+
+                    // Thiết lập danh sách
+                    ArrayAdapter<String> adapter = new ArrayAdapter<>(CheckoutPage.this, android.R.layout.simple_list_item_1, addressArray);
+                    dialogListView.setAdapter(adapter);
+
+                    // Tạo biến dialog trước
+                    AlertDialog dialog = builder.setView(customView).create();
+
+                    // Sự kiện khi chọn địa chỉ
+                    dialogListView.setOnItemClickListener((parent, view, position, id) -> {
+                        Address selectedAddress = addresses.get(position);
+                        primaryAddressTextView.setText("Địa chỉ chính: " + selectedAddress.getFullAddress());
+                        calculateDistanceWithFullAddress(selectedAddress);
+                        dialog.dismiss(); // Đóng dialog sau khi chọn
+                    });
+
+                    // Sự kiện khi nhấn nút hủy
+                    cancelButton.setOnClickListener(v -> dialog.dismiss());
+
+                    // Hiển thị dialog
+                    dialog.show();
                 } else {
-                    Toast.makeText(CheckoutPage.this, "Failed to load addresses", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(CheckoutPage.this, "Không thể tải đại chỉ", Toast.LENGTH_SHORT).show();
                     Log.e(TAG, "Failed to load addresses. Response code: " + response.code());
                 }
             }
 
             @Override
             public void onFailure(Call<List<Address>> call, Throwable t) {
-                Toast.makeText(CheckoutPage.this, "Error loading addresses", Toast.LENGTH_SHORT).show();
+                Toast.makeText(CheckoutPage.this, "Lỗi khi tải địa chỉ", Toast.LENGTH_SHORT).show();
                 Log.e(TAG, "Error fetching addresses", t);
             }
         });
     }
+
+
+
 
     private void calculateDistanceWithFullAddress(Address address) {
         DistanceService distanceService = DistanceRetrofitClient.getDistanceService();
@@ -315,7 +353,6 @@ public class CheckoutPage extends AppCompatActivity {
         Log.d(TAG, "Province City: " + address.getProvinceCity());
         Log.d(TAG, "Latitude: " + address.getLatitude());
         Log.d(TAG, "Longitude: " + address.getLongitude());
-        Log.d(TAG, "Warehouse IDs: " + Arrays.asList(Long.parseLong(selectedWarehouseId)));
 
         Call<DistanceRecord> call = distanceService.calculateDistanceWithFullAddress(
                 address.getReceiverName(),
@@ -335,7 +372,7 @@ public class CheckoutPage extends AppCompatActivity {
                     DistanceRecord newDistanceRecord = response.body();
                     updateUIWithDistanceRecord(newDistanceRecord);
                 } else {
-                    Toast.makeText(CheckoutPage.this, "Failed to calculate distance", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(CheckoutPage.this, "Lỗi khi tính toán khoảng cách", Toast.LENGTH_SHORT).show();
                     Log.e(TAG, "Failed to calculate distance. Response code: " + response.code());
                     try {
                         if (response.errorBody() != null) {
@@ -349,108 +386,12 @@ public class CheckoutPage extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<DistanceRecord> call, Throwable t) {
-                Toast.makeText(CheckoutPage.this, "Error calculating distance", Toast.LENGTH_SHORT).show();
+                Toast.makeText(CheckoutPage.this, "Lỗi khi tính toán khoảng cách", Toast.LENGTH_SHORT).show();
                 Log.e(TAG, "Error calculating distance", t);
             }
         });
     }
-    private void resetDiscountInfo() {
-        discountType.setText("");
-        discountedTotalTextView.setText("");
-        discountedShippingCostTextView.setText("");
-        discountedOrderValue.setText("");
-        totalTextView.setText("Product Total: $" + String.format("%.2f", adapter.getTotalPrice()));
-        shippingCostTextView.setText("Shipping Total: $" + String.format("%.2f", shippingCost));
-        totalCostTextView.setText("Total Cost: $" + String.format("%.2f", adapter.getTotalPrice() + shippingCost));
-    }
 
-    private void applyCoupon() {
-        resetDiscountInfo(); // Reset thông tin giảm giá trước khi áp dụng mã mới
-
-        CustomerCouponService service = CustomerCouponRetrofitClient.getCustomerCouponService();
-        ApplyCouponRequest request = new ApplyCouponRequest();
-        request.setCode(selectedCouponCode);
-
-        double productTotal = adapter.getTotalPrice();
-        request.setOrderValue(productTotal);
-        request.setShippingCost(shippingCost);
-
-        Call<DiscountResult> call = service.applyCoupon(request);
-        call.enqueue(new Callback<DiscountResult>() {
-            @Override
-            public void onResponse(Call<DiscountResult> call, Response<DiscountResult> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    DiscountResult discountResult = response.body();
-                    String discountTypeValue = discountResult.getDiscountType();
-
-                    if ("PRODUCT".equalsIgnoreCase(discountTypeValue)) {
-                        discountType.setText("Discount Type: Product");
-                        discountedOrderValue.setText("Discounted Product Cost: $" + discountResult.getDiscountedOrderValue());
-                        discountedOrderValue.setVisibility(View.VISIBLE);
-                        discountedTotalTextView.setText("Discount Amount: $" + discountResult.getDiscountAmount());
-                        discountedTotalTextView.setVisibility(View.VISIBLE);
-                        discountedShippingCostTextView.setVisibility(View.GONE); // Ẩn khi không có giảm giá vận chuyển
-
-                        finalTotalCost = discountResult.getDiscountedOrderValue() + shippingCost; // Cập nhật tổng chi phí cuối cùng
-                        totalCostTextView.setText("Total Cost: $" + String.format("%.2f", finalTotalCost));
-
-                    } else if ("SHIPPING".equalsIgnoreCase(discountTypeValue)) {
-                        discountType.setText("Discount Type: Shipping");
-                        discountedShippingCostTextView.setText("Discounted Shipping Cost: $" + discountResult.getDiscountedShippingCost());
-                        discountedShippingCostTextView.setVisibility(View.VISIBLE);
-                        discountedOrderValue.setVisibility(View.GONE); // Ẩn khi không có giảm giá sản phẩm
-                        discountedTotalTextView.setText("Discount Amount: $" + discountResult.getDiscountAmount());
-                        discountedTotalTextView.setVisibility(View.VISIBLE);
-
-                        finalTotalCost = productTotal + discountResult.getDiscountedShippingCost(); // Cập nhật tổng chi phí cuối cùng
-                        totalCostTextView.setText("Total Cost: $" + String.format("%.2f", finalTotalCost));
-                    }
-                } else {
-                    Log.e(TAG, "Failed to apply coupon. Response code: " + response.code());
-                    try {
-                        if (response.errorBody() != null) {
-                            Log.e(TAG, "Error Body: " + response.errorBody().string());
-                        }
-                    } catch (IOException e) {
-                        Log.e(TAG, "Error reading error body", e);
-                    }
-                }
-            }
-
-            @Override
-            public void onFailure(Call<DiscountResult> call, Throwable t) {
-                Log.e(TAG, "Error applying coupon", t);
-            }
-        });
-    }
-
-    private void loadCoupons() {
-        CustomerCouponService service = CustomerCouponRetrofitClient.getCustomerCouponService();
-        Call<List<CustomerCoupon>> call = service.getAllCustomerCoupons();
-        call.enqueue(new Callback<List<CustomerCoupon>>() {
-            @Override
-            public void onResponse(Call<List<CustomerCoupon>> call, Response<List<CustomerCoupon>> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    List<CustomerCoupon> coupons = response.body();
-                    ArrayAdapter<String> adapter = new ArrayAdapter<>(CheckoutPage.this, android.R.layout.simple_spinner_item);
-                    adapter.add("Select a coupon");
-                    for (CustomerCoupon coupon : coupons) {
-                        adapter.add(coupon.getCode());
-                    }
-                    adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                    couponSpinner.setAdapter(adapter);
-                    applyCouponButton.setEnabled(false);
-                } else {
-                    Log.e(TAG, "Failed to load coupons. Response code: " + response.code());
-                }
-            }
-
-            @Override
-            public void onFailure(Call<List<CustomerCoupon>> call, Throwable t) {
-                Log.e(TAG, "Error loading coupons", t);
-            }
-        });
-    }
 
     private void loadShippingTypes() {
         ShippingService service = DistanceRetrofitClient.getShippingService();
@@ -487,6 +428,117 @@ public class CheckoutPage extends AppCompatActivity {
             }
         });
     }
+    private void applyCoupon() {
+        resetDiscountInfo(); // Reset thông tin giảm giá trước khi áp dụng mã mới
+
+        CustomerCouponService service = CustomerCouponRetrofitClient.getCustomerCouponService();
+        ApplyCouponRequest request = new ApplyCouponRequest();
+        request.setCode(selectedCouponCode);
+
+        double productTotal = adapter.getTotalPrice();
+        request.setOrderValue(productTotal);
+        request.setShippingCost(shippingCost);
+
+        Call<DiscountResult> call = service.applyCoupon(request);
+        call.enqueue(new Callback<DiscountResult>() {
+            @Override
+            public void onResponse(Call<DiscountResult> call, Response<DiscountResult> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    DiscountResult discountResult = response.body();
+                    String discountTypeValue = discountResult.getDiscountType();
+
+                    // Hiển thị dữ liệu dựa trên loại giảm giá
+                    if ("PRODUCT".equalsIgnoreCase(discountTypeValue)) {
+                        // Loại giảm giá là sản phẩm
+                        discountType.setText("Loại Giảm Giá: Sản Phẩm");
+                        discountType.setVisibility(View.VISIBLE);
+
+                        discountedOrderValue.setText("Tổng Tiền Sản Phẩm Sau Giảm: $" + String.format("%.2f", discountResult.getDiscountedOrderValue()));
+                        discountedOrderValue.setVisibility(View.VISIBLE);
+
+                        discountedTotalTextView.setText("Số Tiền Giảm Giá: $" + String.format("%.2f", discountResult.getDiscountAmount()));
+                        discountedTotalTextView.setVisibility(View.VISIBLE);
+
+                        discountedShippingCostTextView.setVisibility(View.GONE); // Ẩn giảm giá phí vận chuyển
+
+                        // Tính lại tổng chi phí
+                        finalTotalCost = discountResult.getDiscountedOrderValue() + shippingCost;
+                        totalCostTextView.setText("Tổng Chi Phí: $" + String.format("%.2f", finalTotalCost));
+                    } else if ("SHIPPING".equalsIgnoreCase(discountTypeValue)) {
+                        // Loại giảm giá là phí vận chuyển
+                        discountType.setText("Loại Giảm Giá: Vận Chuyển");
+                        discountType.setVisibility(View.VISIBLE);
+
+                        discountedShippingCostTextView.setText("Phí Vận Chuyển Sau Giảm: $" + String.format("%.2f", discountResult.getDiscountedShippingCost()));
+                        discountedShippingCostTextView.setVisibility(View.VISIBLE);
+
+                        discountedOrderValue.setVisibility(View.GONE); // Ẩn giảm giá sản phẩm
+
+                        discountedTotalTextView.setText("Số Tiền Giảm Giá: $" + String.format("%.2f", discountResult.getDiscountAmount()));
+                        discountedTotalTextView.setVisibility(View.VISIBLE);
+
+                        // Tính lại tổng chi phí
+                        finalTotalCost = productTotal + discountResult.getDiscountedShippingCost();
+                        totalCostTextView.setText("Tổng Chi Phí: $" + String.format("%.2f", finalTotalCost));
+                    }
+                } else {
+                    Log.e(TAG, "Failed to apply coupon. Response code: " + response.code());
+                    try {
+                        if (response.errorBody() != null) {
+                            Log.e(TAG, "Error Body: " + response.errorBody().string());
+                        }
+                    } catch (IOException e) {
+                        Log.e(TAG, "Error reading error body", e);
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<DiscountResult> call, Throwable t) {
+                Log.e(TAG, "Error applying coupon", t);
+            }
+        });
+    }
+
+
+
+    private void loadCoupons() {
+        CustomerCouponService service = CustomerCouponRetrofitClient.getCustomerCouponService();
+        Call<List<CustomerCoupon>> call = service.getAllCustomerCoupons();
+        call.enqueue(new Callback<List<CustomerCoupon>>() {
+            @Override
+            public void onResponse(Call<List<CustomerCoupon>> call, Response<List<CustomerCoupon>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    List<CustomerCoupon> coupons = response.body();
+                    ArrayAdapter<String> adapter = new ArrayAdapter<>(CheckoutPage.this, android.R.layout.simple_spinner_item);
+                    adapter.add("Chọn mã giảm giá");
+                    for (CustomerCoupon coupon : coupons) {
+                        adapter.add(coupon.getCode());
+                    }
+                    adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                    couponSpinner.setAdapter(adapter);
+                    applyCouponButton.setEnabled(false);
+                } else {
+                    Log.e(TAG, "Failed to load coupons. Response code: " + response.code());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<CustomerCoupon>> call, Throwable t) {
+                Log.e(TAG, "Error loading coupons", t);
+            }
+        });
+    }
+    private void resetDiscountInfo() {
+        discountType.setText("");
+        discountedTotalTextView.setText("");
+        discountedShippingCostTextView.setText("");
+        discountedOrderValue.setText("");
+        totalTextView.setText("Tiền sản phẩm: $" + String.format("%.2f", adapter.getTotalPrice()));
+        shippingCostTextView.setText("Tiền vận chuyển: $" + String.format("%.2f", shippingCost));
+        totalCostTextView.setText("Tổng tiền: $" + String.format("%.2f", adapter.getTotalPrice() + shippingCost));
+    }
+
 
     private void calculateShippingCost() {
         DistanceRecord distanceRecord = viewModel.getDistanceRecord().getValue();
@@ -495,11 +547,11 @@ public class CheckoutPage extends AppCompatActivity {
 
         if (selectedShipping != null) {
             shippingCost = (selectedShipping.getPricePerKm() * distance) + (selectedShipping.getPricePerKg() * totalWeight);
-            shippingCostTextView.setText("Shipping Total: $" + String.format("%.2f", shippingCost));
+            shippingCostTextView.setText("Tiền vận chuyển: $" + String.format("%.2f", shippingCost));
 
-            double productTotal = Double.parseDouble(totalTextView.getText().toString().replace("Product Total: $", ""));
+            double productTotal = Double.parseDouble(totalTextView.getText().toString().replace("Tiền sản phẩm: $", ""));
             finalTotalCost = productTotal + shippingCost; // Cập nhật tổng chi phí cuối cùng
-            totalCostTextView.setText("Total Cost: $" + String.format("%.2f", finalTotalCost));
+            totalCostTextView.setText("Tổng tiền: $" + String.format("%.2f", finalTotalCost));
         }
     }
 
@@ -509,18 +561,16 @@ public class CheckoutPage extends AppCompatActivity {
         TextView tvWarehouseName = findViewById(R.id.tvWarehouseName);
         TextView distanceTextView = findViewById(R.id.distanceTextView);
         TextView warehouseAddress = findViewById(R.id.warehouseAddress);
-        TextView route = findViewById(R.id.route);
 
-        tvReceiverName.setText("Receiver Name: " + distanceRecord.getReceiverName());
+        tvReceiverName.setText("Tên người nhận: " + distanceRecord.getReceiverName());
         String fullAddress = distanceRecord.getProvinceCity() + ", " + distanceRecord.getDistrict() + ", " +
                 distanceRecord.getWard() + ", " + distanceRecord.getStreet();
-        tvFullAddress.setText("Address: " + fullAddress);
-        tvWarehouseName.setText("Warehouse Name: " + distanceRecord.getWarehouseName());
-        distanceTextView.setText("Distance: " + distanceRecord.getDistance() + " km");
+        tvFullAddress.setText("Địa chỉ: " + fullAddress);
+        tvWarehouseName.setText("Tên kho hàng: " + distanceRecord.getWarehouseName());
+        distanceTextView.setText("Khoảng cách: " + distanceRecord.getDistance() + " km");
         String warehouseFullAddress = distanceRecord.getWarehouseProvinceCity() + ", " + distanceRecord.getWarehouseDistrict() + ", " +
                 distanceRecord.getWarehouseWard();
-        warehouseAddress.setText("Address: " + warehouseFullAddress);
-        route.setText("Route: " + distanceRecord.getRoute());
+        warehouseAddress.setText("Địa chỉ: " + warehouseFullAddress);
 
         calculateShippingCost(); // Tính toán chi phí vận chuyển sau khi cập nhật khoảng cách
     }

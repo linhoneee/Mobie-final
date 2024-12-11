@@ -1,0 +1,10 @@
+<!-- styles.xml -->
+<resources>
+    <!-- Phong cách chung cho dialog -->
+    <style name="CustomAlertDialog" parent="Theme.AppCompat.Light.Dialog.Alert">
+        <item name="android:windowBackground">@drawable/dialog_background</item>
+        <item name="android:padding">16dp</item>
+        <item name="android:textColorPrimary">#333333</item>
+        <item name="android:backgroundDimEnabled">true</item>
+    </style>
+</resources>

@@ -5,6 +5,7 @@ import com.example.brandtests.model.Item;
 
 import retrofit2.Call;
 import retrofit2.http.Body;
+import retrofit2.http.DELETE;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
 import retrofit2.http.PUT;
@@ -23,4 +24,9 @@ public interface CartService {
 
     @GET("/cart/{userId}")
     Call<Cart> getCart(@Path("userId") Long userId);
+
+    @DELETE("cart/{userId}")
+    Call<Cart> clearItemFromCart(@Path("userId") Long userId, @Body Item item);
+
+
 }

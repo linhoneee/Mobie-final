@@ -17,5 +17,7 @@ public interface UserService {
     @POST("/users/login")
     Call<Map<String, String>> loginUser(@Body User loginRequest);
 
+    @GET("/users/SSO/signingoogle")
+    Call<Map<String, String>> loginWithGoogle();
 
 }

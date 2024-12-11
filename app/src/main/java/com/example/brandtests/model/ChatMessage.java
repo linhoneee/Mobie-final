@@ -12,6 +12,9 @@ public class ChatMessage {
     private String updatedAt;
     private String createdAtAsLocalDateTime;
     private String createdAtAsString;
+    // Các trường mới cho URL và loại phương tiện
+    private String mediaUrl;    // URL của file lưu trên Cloudinary
+    private String mediaType;   // Loại file (ví dụ: "image", "video", "audio")
 
     // Constructor không tham số
     public ChatMessage() {}
@@ -22,6 +25,22 @@ public class ChatMessage {
         this.userId = userId;
         this.roomId = roomId;
         this.username = username;
+    }
+
+    public String getMediaUrl() {
+        return mediaUrl;
+    }
+
+    public void setMediaUrl(String mediaUrl) {
+        this.mediaUrl = mediaUrl;
+    }
+
+    public String getMediaType() {
+        return mediaType;
+    }
+
+    public void setMediaType(String mediaType) {
+        this.mediaType = mediaType;
     }
 
     // Getters và Setters

@@ -1,0 +1,5 @@
+<!-- res/drawable/media_background.xml -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="#ffffff" /> <!-- Background color for media view -->
+    <corners android:radius="16dp" /> <!-- Rounded corners -->
+</shape>

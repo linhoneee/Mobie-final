@@ -87,7 +87,9 @@ public class ProductAdapter extends ArrayAdapter<ProductDTOuser> {
             }
 
             addToCartButton.setOnClickListener(v -> {
-                if (stock != null && stock > 0) {
+                if (userId == null || userId == -1) {  // Kiểm tra nếu người dùng chưa đăng nhập
+                    Toast.makeText(getContext(), "Vui lòng đăng nhập để thêm vào giỏ hàng.", Toast.LENGTH_SHORT).show();
+                } else if (stock != null && stock > 0) {
                     Item item = new Item(
                             productDTOuser.getProduct().getId(),
                             productDTOuser.getProduct().getProductName(),
@@ -103,6 +105,7 @@ public class ProductAdapter extends ArrayAdapter<ProductDTOuser> {
                     Toast.makeText(getContext(), "Sản phẩm này đã hết hàng!", Toast.LENGTH_SHORT).show();
                 }
             });
+
         }
 
         return convertView;

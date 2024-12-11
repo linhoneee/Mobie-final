@@ -66,7 +66,7 @@ public class PaymentSuccessActivity extends AppCompatActivity {
                 String payerId = uri.getQueryParameter("PayerID");
 
                 // Hiển thị thông tin thanh toán qua Toast
-                Toast.makeText(this, "Payment Success! Payment ID: " + paymentId, Toast.LENGTH_LONG).show();
+                Toast.makeText(this, "Thanh toán thành công! Mã giao dịch: " + paymentId, Toast.LENGTH_LONG).show();
                 Log.d(TAG, "Payment Success! Payment ID: " + paymentId + ", PayerID: " + payerId);
 
                 // Thực hiện yêu cầu HTTP đến backend để xác nhận thanh toán và gửi dữ liệu lên Kafka

@@ -38,7 +38,6 @@ public class LoginActivity extends AppCompatActivity {
 
         sharedPreferences = getSharedPreferences("LoginPrefs", Context.MODE_PRIVATE);
 
-        // Kiểm tra nếu đã đăng nhập
         checkIfLoggedIn();
 
         // Khởi tạo UserService từ RetrofitClient
@@ -52,13 +51,11 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onChanged(Map<String, String> response) {
                 if (response != null && response.containsKey("token")) {
-                    // Lưu thông tin đăng nhập khi đăng nhập thành công
                     SharedPreferences.Editor editor = sharedPreferences.edit();
                     editor.putString("email", emailEditText.getText().toString());
                     editor.putString("token", response.get("token"));
                     editor.putBoolean("isLoggedIn", true);
 
-                    // Lưu UserID nếu có trong phản hồi từ server
                     if (response.containsKey("UserID")) {
                         editor.putLong("UserID", Long.parseLong(response.get("UserID")));
                         Log.d("LoginActivity", "UserID saved: " + response.get("UserID"));
@@ -68,16 +65,13 @@ public class LoginActivity extends AppCompatActivity {
 
                     editor.apply();
 
-                    // Log dữ liệu phản hồi từ BE
                     Log.d("LoginActivity", "Đăng nhập thành công: " + response.toString());
 
-                    // Hiển thị thông báo đăng nhập thành công
                     Toast.makeText(LoginActivity.this, "Đăng nhập thành công", Toast.LENGTH_SHORT).show();
 
-                    // Quay lại MainActivity
                     Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                     startActivity(intent);
-                    finish(); // Kết thúc LoginActivity để quay lại MainActivity
+                    finish();
 
                 } else {
                     Toast.makeText(LoginActivity.this, "Đăng nhập thất bại", Toast.LENGTH_SHORT).show();
@@ -113,7 +107,6 @@ public class LoginActivity extends AppCompatActivity {
     private void checkIfLoggedIn() {
         boolean isLoggedIn = sharedPreferences.getBoolean("isLoggedIn", false);
         if (isLoggedIn) {
-            // Đã đăng nhập, ẩn nút đăng nhập và hiển thị nút đăng xuất
             loginButton.setVisibility(View.GONE);
             logoutButton.setVisibility(View.VISIBLE);
 

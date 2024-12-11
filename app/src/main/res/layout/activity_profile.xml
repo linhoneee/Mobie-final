@@ -1,6 +1,7 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="#E8F5E9">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -13,12 +14,15 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:background="@color/green_dark"
             android:padding="24dp"
             android:gravity="center"
             android:layout_marginBottom="16dp"
             android:elevation="4dp"
-            android:clipToPadding="false">
+            android:clipToPadding="false"
+            android:layout_margin="8dp"
+            android:backgroundTintMode="src_in"
+            android:backgroundTint="#388E3C"
+            android:background="@drawable/rounded_background">
 
             <ImageView
                 android:id="@+id/profileImage"
@@ -27,7 +31,8 @@
                 android:src="@drawable/boy"
                 android:padding="8dp"
                 android:elevation="8dp"
-                android:layout_gravity="center"/>
+                android:layout_gravity="center"
+                android:background="@drawable/circle_background" />
 
             <TextView
                 android:id="@+id/tvName"
@@ -35,7 +40,7 @@
                 android:layout_height="wrap_content"
                 android:textSize="20sp"
                 android:textStyle="bold"
-                android:textColor="@color/white"
+                android:textColor="@android:color/white"
                 android:paddingTop="8dp"
                 android:layout_gravity="center" />
         </LinearLayout>
@@ -45,19 +50,18 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:background="@color/white"
             android:padding="16dp"
             android:elevation="2dp"
-            android:layout_marginBottom="16dp"
-            android:layout_margin="8dp">
+            android:layout_margin="8dp"
+            android:background="@drawable/rounded_background">
 
             <TextView
                 android:id="@+id/tvEmail"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Email:"
-                android:textColor="@color/green_dark"
-                android:textSize="14sp"
+                android:textColor="#388E3C"
+                android:textSize="16sp"
                 android:paddingBottom="4dp" />
 
             <TextView
@@ -65,8 +69,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Ngày sinh:"
-                android:textColor="@color/green_dark"
-                android:textSize="14sp"
+                android:textColor="#388E3C"
+                android:textSize="16sp"
                 android:paddingBottom="4dp" />
 
             <TextView
@@ -74,12 +78,12 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Giới tính:"
-                android:textColor="@color/green_dark"
-                android:textSize="14sp"
+                android:textColor="#388E3C"
+                android:textSize="16sp"
                 android:paddingBottom="4dp" />
         </LinearLayout>
 
-        <!-- Address Section -->
+        <!-- Address Section Header -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -87,19 +91,24 @@
             android:text="Địa chỉ"
             android:textSize="18sp"
             android:textStyle="bold"
-            android:textColor="@color/green_dark" />
+            android:textColor="#388E3C"
+            android:layout_marginStart="8dp" />
 
+        <!-- Address Table -->
         <TableLayout
             android:id="@+id/addressTable"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="12dp"
-            android:layout_marginBottom="16dp"
-            android:background="@color/white"
-            android:elevation="2dp">
+            android:textSize="16sp"
+
+            android:layout_margin="8dp"
+            android:elevation="2dp"
+            android:background="@drawable/rounded_background">
+
         </TableLayout>
 
-        <!-- Order History Section -->
+        <!-- Order History Section Header -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -107,16 +116,22 @@
             android:textSize="18sp"
             android:paddingTop="16dp"
             android:textStyle="bold"
-            android:textColor="@color/green_dark" />
+            android:textColor="#388E3C"
+            android:layout_marginStart="8dp" />
 
+        <!-- Order History Container -->
         <LinearLayout
             android:id="@+id/orderHistoryContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="12dp"
+            android:layout_margin="8dp"
+            android:textSize="16sp"
+
+            android:background="@drawable/rounded_background"
             android:elevation="2dp"
-            android:layout_margin="8dp">
+            android:orientation="vertical"
+            android:padding="12dp">
+
         </LinearLayout>
 
     </LinearLayout>

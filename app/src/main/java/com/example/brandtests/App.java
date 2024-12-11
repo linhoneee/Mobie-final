@@ -7,8 +7,10 @@ import android.os.Looper;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.example.brandtests.model.ChatMessage;
 import com.example.brandtests.service.WebSocketService;
 import com.example.brandtests.view.ChatActivity;
+import com.google.gson.Gson;
 
 public class App extends Application {
     private static final String TAG = "App";
@@ -22,7 +24,6 @@ public class App extends Application {
         sharedPreferences = getSharedPreferences("LoginPrefs", MODE_PRIVATE);
         long userId = sharedPreferences.getLong("UserID", -1);
 
-        // Khởi tạo WebSocket và kết nối
         webSocketService = new WebSocketService(this::onNewMessageReceived);
         webSocketService.connectWebSocket(userId);
     }
@@ -30,21 +31,20 @@ public class App extends Application {
     private void onNewMessageReceived(String message) {
         Log.d(TAG, "Received message: " + message);
 
+        Gson gson = new Gson();
+        ChatMessage messageObj = gson.fromJson(message, ChatMessage.class);
+
         // Kiểm tra Activity hiện tại, nếu là ChatActivity thì cập nhật giao diện, nếu không thì hiện Toast
         if (ChatActivity.isActive()) {
-            // Cập nhật RecyclerView của ChatActivity
             ChatActivity.updateMessages(message);
         } else {
-            // Sử dụng Handler để đảm bảo Toast chạy trên UI thread
             new Handler(Looper.getMainLooper()).post(() -> {
-                Toast.makeText(getApplicationContext(), "New message: " + message, Toast.LENGTH_SHORT).show();
-                NotificationHelper.showNotification(getApplicationContext(), "New Message", "You have received a new message!");
+                String text = messageObj.getText();  // Lấy text từ Message object
+                Toast.makeText(getApplicationContext(), "Tin nhắn mới: " + text, Toast.LENGTH_SHORT).show();
 
+                NotificationHelper.showNotification(getApplicationContext(), "Tin nhắn mới", "Bạn đã nhận được tin nhắn mới!");
             });
         }
     }
 
-    public WebSocketService getWebSocketService() {
-        return webSocketService;
-    }
 }
